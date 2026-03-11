@@ -19,6 +19,6 @@ export const appointments = pgTable("appointments", {
     mode: "string",
   }).notNull(),
   status: text("status").notNull().default("pending"), // 'pending' | 'confirmed' | 'cancelled'
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });

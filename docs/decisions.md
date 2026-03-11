@@ -9,6 +9,7 @@ This document explains the reasoning behind important architectural choices in S
 **Decision:** use Fastify as the HTTP framework.
 
 **Reasons:**
+
 - Better performance than Express
 - Strong TypeScript ecosystem
 
@@ -21,6 +22,7 @@ This document explains the reasoning behind important architectural choices in S
 **Decision:** use JSON Schema natively for request validation.
 
 **Reasons:**
+
 - Fastify internally uses JSON Schema — adding Zod would create a second validation layer
 - Keeps the validation pipeline simple and consistent
 - TypeScript types are derived using `json-schema-to-ts`
@@ -34,6 +36,7 @@ This document explains the reasoning behind important architectural choices in S
 **Decision:** use Drizzle ORM for database access.
 
 **Reasons:**
+
 - SQL-first approach — closer to raw SQL
 - Strong type inference without a separate code generation step
 - Lightweight runtime with no binary dependencies
@@ -47,13 +50,15 @@ This document explains the reasoning behind important architectural choices in S
 **Decision:** use `SELECT FOR UPDATE` to prevent double booking.
 
 **Reasons:**
+
 - Simple to implement within a single PostgreSQL instance
 - Reliable — the database engine handles the concurrency guarantees
 - No external infrastructure required
 
 **What was considered:**
-- *Optimistic locking* — would require retry logic on the application side
-- *Pending bookings table with TTL* — a valid pattern for payment flows, but requires a background job to expire records; out of scope for now
+
+- _Optimistic locking_ — would require retry logic on the application side
+- _Pending bookings table with TTL_ — a valid pattern for payment flows, but requires a background job to expire records; out of scope for now
 
 ---
 
@@ -62,6 +67,7 @@ This document explains the reasoning behind important architectural choices in S
 **Decision:** instantiate and inject dependencies manually in the HTTP layer.
 
 **Reasons:**
+
 - Keeps the project simple
 - No framework — dependencies are explicit and easy to trace
 - Appropriate for a small codebase
@@ -75,7 +81,8 @@ This document explains the reasoning behind important architectural choices in S
 **Decision:** store all timestamps in UTC using `mode: 'string'` in Drizzle.
 
 **Reasons:**
-- JavaScript `Date` objects automatically apply the machine timezone, which causes subtle bugs in scheduling logic
+
+- JavaScript `Date` objects automatically apply the machine timezone, which causes subtle bugs in all timestamps.
 - Storing as strings avoids implicit conversions at the ORM level
 - The frontend is responsible for displaying times in the user's local timezone
 
