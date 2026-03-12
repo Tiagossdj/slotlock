@@ -1,31 +1,31 @@
-import { eq, inArray } from "drizzle-orm";
-import { db } from "../../../../infra/database/db";
-import { serviceResources, services } from "../../../../../db/schema";
+import { eq, inArray } from 'drizzle-orm'
+import { serviceResources, services } from '../../../../../db/schema'
+import { db } from '../../../../infra/database/db'
 import type {
   IServiceRepository,
-  Service,
   NewService,
-} from "../../domain/repositories/IServiceRepository";
+  Service,
+} from '../../domain/repositories/IServiceRepository'
 
 export class DrizzleServiceRepository implements IServiceRepository {
   async findById(id: string): Promise<Service | null> {
-    const result = await db.select().from(services).where(eq(services.id, id));
+    const result = await db.select().from(services).where(eq(services.id, id))
 
-    return result[0] ?? null;
+    return result[0] ?? null
   }
 
   async findAll(): Promise<Service[]> {
-    return await db.select().from(services);
+    return await db.select().from(services)
   }
 
   async findByIds(ids: string[]): Promise<Service[]> {
-    return await db.select().from(services).where(inArray(services.id, ids));
+    return await db.select().from(services).where(inArray(services.id, ids))
   }
 
   async create(data: NewService): Promise<Service> {
-    const result = await db.insert(services).values(data).returning();
+    const result = await db.insert(services).values(data).returning()
 
-    return result[0];
+    return result[0]
   }
 
   async update(id: string, data: Partial<NewService>): Promise<Service> {
@@ -33,13 +33,13 @@ export class DrizzleServiceRepository implements IServiceRepository {
       .update(services)
       .set({ ...data, updatedAt: new Date().toISOString() })
       .where(eq(services.id, id))
-      .returning();
+      .returning()
 
-    return result[0];
+    return result[0]
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(services).where(eq(services.id, id));
+    await db.delete(services).where(eq(services.id, id))
   }
 
   async findResourcesByServiceId(
@@ -48,8 +48,8 @@ export class DrizzleServiceRepository implements IServiceRepository {
     const result = await db
       .select({ resourceId: serviceResources.resourceId })
       .from(serviceResources)
-      .where(eq(serviceResources.serviceId, serviceId));
+      .where(eq(serviceResources.serviceId, serviceId))
 
-    return result;
+    return result
   }
 }

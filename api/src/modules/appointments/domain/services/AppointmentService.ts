@@ -1,15 +1,13 @@
-import type {
-  IAppointmentRepository,
-} from "@/modules/resources/domain/repositories/IAppointmentRepository";
-import type { IServiceRepository } from "@/modules/resources/domain/repositories/IServiceRepository";
-import { ConflictError } from "@/core/errors/ConflictError";
-import { AppError } from "@/core/errors/AppError";
-import { NotFoundError } from "@/core/errors/NotFoundError";
+import { AppError } from '@/core/errors/AppError'
+import { ConflictError } from '@/core/errors/ConflictError'
+import { NotFoundError } from '@/core/errors/NotFoundError'
+import type { IAppointmentRepository } from '@/modules/appointments/domain/repositories/IAppointmentRepository'
+import type { IServiceRepository } from '@/modules/services/domain/repositories/IServiceRepository'
 
 interface CreateAppointmentInput {
-  userId: string;
-  serviceId: string;
-  startTime: string;
+  userId: string
+  serviceId: string
+  startTime: string
 }
 
 export class AppointmentService {
@@ -20,25 +18,25 @@ export class AppointmentService {
 
   async execute(input: CreateAppointmentInput) {
     // 1 - busca o serviço
-    const service = await this.serviceRepository.findById(input.serviceId);
+    const service = await this.serviceRepository.findById(input.serviceId)
     if (!service) {
-      throw new NotFoundError("Service not Found");
+      throw new NotFoundError('Service not Found')
     }
 
     // 2 - calcula o endtime baseado na duração do serviço
-    const startDate = new Date(input.startTime);
+    const startDate = new Date(input.startTime)
     const endDate = new Date(
       startDate.getTime() + service.durationMinutes * 60000,
-    );
-    const endTime = endDate.toISOString();
+    )
+    const endTime = endDate.toISOString()
 
     // 3 - busca os recursos que o serviço exige
     const serviceResourcesList =
-      await this.serviceRepository.findResourcesByServiceId(input.serviceId);
-    const resourcesIds = serviceResourcesList.map((r) => r.resourceId);
+      await this.serviceRepository.findResourcesByServiceId(input.serviceId)
+    const resourcesIds = serviceResourcesList.map((r) => r.resourceId)
 
     if (resourcesIds.length === 0) {
-      throw new AppError("service has no resources configured", 400);
+      throw new AppError('service has no resources configured', 400)
     }
 
     // 4 - checa conflitos (se algum está ocupado no intervalo)
@@ -46,13 +44,13 @@ export class AppointmentService {
       resourcesIds,
       input.startTime,
       endTime,
-    );
+    )
 
     // 5 - se houver conflito, lança o erro
     if (conflicting.length > 0) {
       throw new ConflictError(
-        "One or more resources are unavailable for this time slot",
-      );
+        'One or more resources are unavailable for this time slot',
+      )
     }
 
     // 6 - cria o agendamento
@@ -61,7 +59,7 @@ export class AppointmentService {
       serviceId: input.serviceId,
       startTime: input.startTime,
       endTime: endTime,
-      status: "pending",
-    });
+      status: 'pending',
+    })
   }
 }

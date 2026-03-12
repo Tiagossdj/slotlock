@@ -1,24 +1,24 @@
-import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
-import { users } from "./users";
-import { services } from "./services";
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { services } from './services'
+import { users } from './users'
 
-export const appointments = pgTable("appointments", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id")
+export const appointments = pgTable('appointments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
     .notNull()
     .references(() => users.id),
-  serviceId: uuid("service_id")
+  serviceId: uuid('service_id')
     .notNull()
     .references(() => services.id),
-  startTime: timestamp("start_time", {
+  startTime: timestamp('start_time', {
     withTimezone: false,
-    mode: "string",
+    mode: 'string',
   }).notNull(),
-  endTime: timestamp("end_time", {
+  endTime: timestamp('end_time', {
     withTimezone: false,
-    mode: "string",
+    mode: 'string',
   }).notNull(),
-  status: text("status").notNull().default("pending"), // 'pending' | 'confirmed' | 'cancelled'
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
-});
+  status: text('status').notNull().default('pending'), // 'pending' | 'confirmed' | 'cancelled'
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+})

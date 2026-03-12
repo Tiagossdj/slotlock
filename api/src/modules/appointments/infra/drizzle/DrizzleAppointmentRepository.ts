@@ -1,30 +1,30 @@
-import { eq, inArray, sql } from "drizzle-orm";
-import { db } from "../../../../infra/database/db";
-import { appointments, appointmentResources } from "../../../../../db/schema";
+import { eq, sql } from 'drizzle-orm'
+import { appointments } from '../../../../../db/schema'
+import { db } from '../../../../infra/database/db'
 import type {
-  IAppointmentRepository,
   Appointment,
+  IAppointmentRepository,
   NewAppointment,
-} from "../../domain/repositories/IAppointmentRepository";
+} from '../../domain/repositories/IAppointmentRepository'
 
 export class DrizzleAppointmentRepository implements IAppointmentRepository {
   async findById(id: string): Promise<Appointment | null> {
     const result = await db
       .select()
       .from(appointments)
-      .where(eq(appointments.id, id));
+      .where(eq(appointments.id, id))
 
-    return result[0] ?? null;
+    return result[0] ?? null
   }
 
   async findAll(): Promise<Appointment[]> {
-    return await db.select().from(appointments);
+    return await db.select().from(appointments)
   }
 
   async create(data: NewAppointment): Promise<Appointment> {
-    const result = await db.insert(appointments).values(data).returning();
+    const result = await db.insert(appointments).values(data).returning()
 
-    return result[0];
+    return result[0]
   }
 
   async update(
@@ -35,13 +35,13 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
       .update(appointments)
       .set({ ...data, updatedAt: new Date().toISOString() })
       .where(eq(appointments.id, id))
-      .returning();
+      .returning()
 
-    return result[0];
+    return result[0]
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(appointments).where(eq(appointments.id, id));
+    await db.delete(appointments).where(eq(appointments.id, id))
   }
 
   async findConflictResources(
@@ -61,9 +61,9 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
                 ${endTime}::timestamp
             )
             FOR UPDATE
-            `);
+            `)
 
-      return result.rows as { resourceId: string }[];
-    });
+      return result.rows as { resourceId: string }[]
+    })
   }
 }

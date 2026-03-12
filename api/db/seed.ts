@@ -1,55 +1,55 @@
-import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import * as schema from "./schema";
-import { env } from "../src/config/env";
+import 'dotenv/config'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { Pool } from 'pg'
+import { env } from '../src/config/env'
+import * as schema from './schema'
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
-});
+})
 
-const db = drizzle(pool, { schema });
+const db = drizzle(pool, { schema })
 
 async function seed() {
-  console.log("🌱 Seeding database...");
+  console.log('🌱 Seeding database...')
 
   // Resources
-  const [professional, room, equipment] = await db
+  const [_professional, _room, _equipment] = await db
     .insert(schema.resources)
     .values([
-      { name: "Ana Paula", type: "professional" },
-      { name: "Sala 1", type: "room" },
-      { name: "Kit Lash", type: "equipment" },
+      { name: 'Ana Paula', type: 'professional' },
+      { name: 'Sala 1', type: 'room' },
+      { name: 'Kit Lash', type: 'equipment' },
     ])
-    .returning();
+    .returning()
 
-  console.log("✅ Resouces created");
+  console.log('✅ Resouces created')
 
   // Services
-  const [lashService] = await db
+  const [_lashService] = await db
     .insert(schema.services)
     .values([
-      { name: "Lash Designer", durationMinutes: 120 },
-      { name: "Manicure", durationMinutes: 60 },
+      { name: 'Lash Designer', durationMinutes: 120 },
+      { name: 'Manicure', durationMinutes: 60 },
     ])
-    .returning();
+    .returning()
 
-  console.log("✅ Service resources linked");
+  console.log('✅ Service resources linked')
 
   // User
   await db.insert(schema.users).values([
-    { email: "client@email.com", role: "client" },
-    { email: "admin@slotlock.com", role: "admin" },
-  ]);
+    { email: 'client@email.com', role: 'client' },
+    { email: 'admin@slotlock.com', role: 'admin' },
+  ])
 
-  console.log("✅ Users created");
-  console.log("🎉 Seed completed!");
+  console.log('✅ Users created')
+  console.log('🎉 Seed completed!')
 
-  await pool.end();
+  await pool.end()
 }
 
 seed().catch((err) => {
-  console.error("seed failed:", err);
-  pool.end();
-  process.exit(1);
-});
+  console.error('seed failed:', err)
+  pool.end()
+  process.exit(1)
+})

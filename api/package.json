@@ -16,6 +16,9 @@
     "lint": "biome check .",
     "lint:fix": "biome check . --write"
   },
+  "lint-staged": {
+    "*.ts": "biome check --write"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -34,6 +37,7 @@
     "@types/node": "^25.3.5",
     "@types/pg": "^8.18.0",
     "drizzle-kit": "^0.31.9",
+    "lint-staged": "^16.3.3",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"

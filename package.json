@@ -8,14 +8,14 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "api/**/*.ts": "biome check --write"
+    "api/**/*.ts": "cd api && pnpm exec biome check --write"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.29.2",
   "devDependencies": {
-    "husky": "^9.1.7",
+    "husky": "...",
     "lint-staged": "^16.3.3"
   }
 }
