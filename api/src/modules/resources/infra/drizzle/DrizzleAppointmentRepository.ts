@@ -45,7 +45,7 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
   }
 
   async findConflictResources(
-    resourceIds: string,
+    resourceIds: string[],
     startTime: string,
     endTime: string,
   ): Promise<{ resourceId: string }[]> {
