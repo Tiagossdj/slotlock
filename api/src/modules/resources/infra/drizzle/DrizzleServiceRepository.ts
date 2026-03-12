@@ -1,6 +1,6 @@
 import { eq, inArray } from "drizzle-orm";
 import { db } from "../../../../infra/database/db";
-import { services } from "../../../../../db/schema";
+import { serviceResources, services } from "../../../../../db/schema";
 import type {
   IServiceRepository,
   Service,
@@ -40,5 +40,16 @@ export class DrizzleServiceRepository implements IServiceRepository {
 
   async delete(id: string): Promise<void> {
     await db.delete(services).where(eq(services.id, id));
+  }
+
+  async findResourcesByServiceId(
+    serviceId: string,
+  ): Promise<{ resourceId: string }[]> {
+    const result = await db
+      .select({ resourceId: serviceResources.resourceId })
+      .from(serviceResources)
+      .where(eq(serviceResources.serviceId, serviceId));
+
+    return result;
   }
 }
