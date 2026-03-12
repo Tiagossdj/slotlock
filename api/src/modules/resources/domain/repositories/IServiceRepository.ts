@@ -11,4 +11,7 @@ export interface IServiceRepository {
   create(data: NewService): Promise<Service>;
   update(id: string, data: Partial<NewService>): Promise<Service>;
   delete(id: string): Promise<void>;
+  findResourcesByServiceId(
+    serviceId: string,
+  ): Promise<{ resourceId: string }[]>;
 }
