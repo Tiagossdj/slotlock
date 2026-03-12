@@ -11,7 +11,7 @@ export interface IAppointmentRepository {
   update(id: string, data: Partial<NewAppointment>): Promise<Appointment>;
   delete(id: string): Promise<void>;
   findConflictResources(
-    resourceIds: string,
+    resourceIds: string[],
     startTime: string,
     endTime: string,
   ): Promise<{ resourceId: string }[]>;
