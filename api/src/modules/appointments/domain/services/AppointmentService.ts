@@ -1,6 +1,5 @@
 import type {
   IAppointmentRepository,
-  NewAppointment,
 } from "@/modules/resources/domain/repositories/IAppointmentRepository";
 import type { IServiceRepository } from "@/modules/resources/domain/repositories/IServiceRepository";
 import { ConflictError } from "@/core/errors/ConflictError";
@@ -61,7 +60,7 @@ export class AppointmentService {
       userId: input.userId,
       serviceId: input.serviceId,
       startTime: input.startTime,
-      endtime: endTime,
+      endTime: endTime,
       status: "pending",
     });
   }

@@ -14,7 +14,7 @@ export const appointments = pgTable("appointments", {
     withTimezone: false,
     mode: "string",
   }).notNull(),
-  endtime: timestamp("end_time", {
+  endTime: timestamp("end_time", {
     withTimezone: false,
     mode: "string",
   }).notNull(),
