@@ -9,6 +9,8 @@ const start = async () => {
       app.log.error(err)
       process.exit(1)
     }
+
+    app.log.info(`>> For Devs http://localhost:${env.PORT}`)
   })
 }
 

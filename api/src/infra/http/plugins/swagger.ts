@@ -1,8 +1,9 @@
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
 import type { FastifyInstance } from 'fastify'
+import fp from 'fastify-plugin'
 
-export async function swaggerPlugin(app: FastifyInstance) {
+export const swaggerPlugin = fp(async (app: FastifyInstance) => {
   await app.register(fastifySwagger, {
     openapi: {
       info: {
@@ -10,10 +11,15 @@ export async function swaggerPlugin(app: FastifyInstance) {
         description: 'Resource-aware scheduling API',
         version: '1.0.0',
       },
+      servers: [
+        {
+          url: 'http://localhost:3000',
+        },
+      ],
     },
   })
 
   await app.register(fastifySwaggerUi, {
     routePrefix: '/docs',
   })
-}
+})
