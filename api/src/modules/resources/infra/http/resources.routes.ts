@@ -24,8 +24,7 @@ const resourceResponseSchema = {
   },
 }
 
-export async function resourcesRoutes(route: AppInstance) {
-  const app = route.withTypeProvider<JsonSchemaToTsProvider>()
+export async function resourcesRoutes(app: AppInstance) {
   const repository = new DrizzleResourceRepository()
   const controller = new ResourceController(repository)
 
