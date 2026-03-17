@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import { env } from '@/config/env'
 import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes'
+import { errorHandler } from './error-handler'
 import { swaggerPlugin } from './plugins/swagger'
 
 const isDev = env.NODE_ENV === 'development'
@@ -20,6 +21,9 @@ export async function buildApp() {
         }
       : true,
   })
+
+  // Error Handler
+  errorHandler(app)
 
   // SWAGGER
   await app.register(swaggerPlugin)
