@@ -13,8 +13,14 @@ const db = drizzle(pool, { schema })
 async function seed() {
   console.log('🌱 Seeding database...')
 
+  await db.delete(schema.serviceResources)
+  await db.delete(schema.appointments)
+  await db.delete(schema.services)
+  await db.delete(schema.resources)
+  await db.delete(schema.users)
+
   // Resources
-  const [_professional, _room, _equipment] = await db
+  const [professional, room, equipment] = await db
     .insert(schema.resources)
     .values([
       { name: 'Ana Paula', type: 'professional' },
@@ -26,13 +32,22 @@ async function seed() {
   console.log('✅ Resouces created')
 
   // Services
-  const [_lashService] = await db
+  const [lashService] = await db
     .insert(schema.services)
     .values([
       { name: 'Lash Designer', durationMinutes: 120 },
       { name: 'Manicure', durationMinutes: 60 },
     ])
     .returning()
+
+  console.log('✅ Services created')
+
+  // Service Resources — vincula recursos ao serviço
+  await db.insert(schema.serviceResources).values([
+    { serviceId: lashService.id, resourceId: professional.id },
+    { serviceId: lashService.id, resourceId: room.id },
+    { serviceId: lashService.id, resourceId: equipment.id },
+  ])
 
   console.log('✅ Service resources linked')
 

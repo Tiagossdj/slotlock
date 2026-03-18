@@ -1,5 +1,6 @@
 import Fastify from 'fastify'
 import { env } from '@/config/env'
+import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
 import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes'
 import { servicesRoutes } from '@/modules/services/infra/http/services.routes'
 import { errorHandler } from './error-handler'
@@ -32,6 +33,7 @@ export async function buildApp() {
   // ROUTES
   await app.register(resourcesRoutes, { prefix: '/api' })
   await app.register(servicesRoutes, { prefix: '/api' })
+  await app.register(appointmentsRoutes, { prefix: '/api' })
 
   return app
 }
