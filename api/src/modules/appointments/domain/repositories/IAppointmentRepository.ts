@@ -1,14 +1,14 @@
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm'
-import type { appointments } from '../../../../../db/schema'
-
-export type Appointment = InferSelectModel<typeof appointments>
-export type NewAppointment = InferInsertModel<typeof appointments>
+import type {
+  Appointment,
+  CreateAppointmentData,
+  UpdateAppointmentData,
+} from '../entities/Appointment'
 
 export interface IAppointmentRepository {
   findById(id: string): Promise<Appointment | null>
   findAll(): Promise<Appointment[]>
-  create(data: NewAppointment): Promise<Appointment>
-  update(id: string, data: Partial<NewAppointment>): Promise<Appointment>
+  create(data: CreateAppointmentData): Promise<Appointment>
+  update(id: string, data: Partial<UpdateAppointmentData>): Promise<Appointment>
   delete(id: string): Promise<void>
   findConflictResources(
     resourceIds: string[],
