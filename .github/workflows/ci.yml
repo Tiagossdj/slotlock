@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: slotlock
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: api/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: api
+        run: pnpm install
+
+      - name: Lint
+        working-directory: api
+        run: pnpm biome check .
+
+      - name: Run migrations
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5433/slotlock
+          PORT: 3000
+          HOST: 0.0.0.0
+          NODE_ENV: test
+        run: pnpm drizzle-kit migrate
+
+      - name: Run tests
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5433/slotlock
+          PORT: 3000
+          HOST: 0.0.0.0
+          NODE_ENV: test
+        run: pnpm test:run
