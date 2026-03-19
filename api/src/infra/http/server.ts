@@ -1,3 +1,4 @@
+import fastifyCors from '@fastify/cors'
 import Fastify from 'fastify'
 import { env } from '@/config/env'
 import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
@@ -26,6 +27,12 @@ export async function buildApp() {
 
   // Error Handler
   errorHandler(app)
+
+  // CORS
+  await app.register(fastifyCors, {
+    origin: 'http://localhost:3001',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  })
 
   // SWAGGER
   await app.register(swaggerPlugin)
