@@ -32,12 +32,16 @@ export function useCreateResource() {
 }
 
 export function useDeleteResource() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) =>
-      apiFetch(`/api/resources/${id}`, { method: "DELETE" }),
+      apiFetch(`/api/resources/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["resources"] });
+      console.log('deleted! invalidating...')
+      queryClient.invalidateQueries({ queryKey: ['resources'] })
     },
-  });
+    onError: (err) => {
+      console.log('delete error:', err)
+    },
+  })
 }
