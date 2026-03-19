@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { Toaster } from 'sonner'
 
 const geist = Geist({ subsets: ['latin'] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({
               {children}
             </main>
           </div>
+          <Toaster />
         </Providers>
       </body>
     </html>
