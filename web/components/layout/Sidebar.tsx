@@ -1,20 +1,26 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Briefcase, Calendar, Clock } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  Calendar,
+  Clock,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/resources', label: 'Resources', icon: Users },
-  { href: '/services', label: 'Services', icon: Briefcase },
-  { href: '/appointments', label: 'Appointments', icon: Calendar },
-  { href: '/availability', label: 'Availability', icon: Clock },
-]
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/Resources", label: "Resources", icon: Users },
+  { href: "/Services", label: "Services", icon: Briefcase },
+  { href: "/Appointments", label: "Appointments", icon: Calendar },
+  { href: "/Availability", label: "Availability", icon: Clock },
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <aside className="w-64 min-h-screen bg-card border-r border-border flex flex-col">
@@ -32,23 +38,23 @@ export function Sidebar() {
 
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors',
+                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
                 isActive
-                  ? 'bg-primary text-primary-foreground font-medium'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
+                  ? "bg-primary text-primary-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary",
               )}
             >
               <Icon size={18} />
               {item.label}
             </Link>
-          )
+          );
         })}
       </nav>
 
@@ -56,5 +62,5 @@ export function Sidebar() {
         <p className="text-xs text-muted-foreground">API: localhost:3000</p>
       </div>
     </aside>
-  )
+  );
 }
