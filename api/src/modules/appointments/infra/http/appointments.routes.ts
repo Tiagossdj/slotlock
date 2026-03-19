@@ -25,7 +25,17 @@ const appointmentResponseSchema = {
     createdAt: { type: 'string' },
     updatedAt: { type: 'string' },
   },
-}
+} as const
+
+const availabilityQuerySchema = {
+  type: 'object',
+  required: ['serviceId', 'date'],
+  properties: {
+    serviceId: { type: 'string' },
+    date: { type: 'string', format: 'date' },
+  },
+  additionalProperties: false,
+} as const
 
 export async function appointmentsRoutes(app: AppInstance) {
   const appointmentRepository = new DrizzleAppointmentRepository()
@@ -112,6 +122,35 @@ export async function appointmentsRoutes(app: AppInstance) {
     async (req, reply) => {
       await controller.delete(req.params.id)
       return reply.status(204).send(null)
+    },
+  )
+
+  app.get(
+    '/availability',
+    {
+      schema: {
+        summary: 'Get available slots for a service on a date',
+        tags: ['Appointments'],
+        querystring: availabilityQuerySchema,
+        response: {
+          200: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                startTime: { type: 'string' },
+                endTime: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    async (req, reply) => {
+      const { serviceId, date } = req.query
+      const slots = await controller.getAvailability(serviceId, date)
+      return reply.status(200).send(slots as never)
     },
   )
 }
