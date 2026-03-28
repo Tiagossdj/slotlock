@@ -62,20 +62,20 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
   ): Promise<{ resourceId: string }[]> {
     return await db.transaction(async (tx) => {
       const result = await tx.execute(sql`
-            SELECT ar.resource_id as "resourceId"
-            FROM appointment_resources ar
-            INNER JOIN appointments a ON a.id = ar.appointment_id
-            WHERE ar.resource_id = ANY(ARRAY[${sql.join(
-              resourceIds.map((id) => sql`${id}::uuid`),
-              sql`, `,
-            )}])
-            AND a.status != 'cancelled'
-            AND (a.start_time, a.end_time) OVERLAPS (
-                ${startTime}::timestamp,
-                ${endTime}::timestamp
-            )
-            FOR UPDATE
-            `)
+        SELECT ar.resource_id as "resourceId"
+        FROM appointment_resources ar
+        INNER JOIN appointments a ON a.id = ar.appointment_id
+        WHERE ar.resource_id = ANY(ARRAY[${sql.join(
+          resourceIds.map((id) => sql`${id}::uuid`),
+          sql`, `,
+        )}])
+        AND a.status != 'cancelled'
+        AND (a.start_time, a.end_time) OVERLAPS (
+          ${startTime}::timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo',
+          ${endTime}::timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo'
+        )
+        FOR UPDATE
+      `)
 
       return result.rows as { resourceId: string }[]
     })

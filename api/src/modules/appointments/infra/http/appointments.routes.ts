@@ -59,6 +59,35 @@ export async function appointmentsRoutes(app: AppInstance) {
       return reply.status(200).send(appointments as never)
     },
   )
+  app.get(
+    '/availability',
+    {
+      schema: {
+        summary: 'Get available slots for a service on a date',
+        tags: ['Appointments'],
+        querystring: availabilityQuerySchema,
+        response: {
+          200: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                startTime: { type: 'string' },
+                endTime: { type: 'string' },
+                available: { type: 'boolean' },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    async (req, reply) => {
+      const { serviceId, date } = req.query
+      const slots = await controller.getAvailability(serviceId, date)
+      return reply.status(200).send(slots as never)
+    },
+  )
 
   app.get(
     '/appointments/:id',
@@ -122,35 +151,6 @@ export async function appointmentsRoutes(app: AppInstance) {
     async (req, reply) => {
       await controller.delete(req.params.id)
       return reply.status(204).send(null)
-    },
-  )
-
-  app.get(
-    '/availability',
-    {
-      schema: {
-        summary: 'Get available slots for a service on a date',
-        tags: ['Appointments'],
-        querystring: availabilityQuerySchema,
-        response: {
-          200: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                startTime: { type: 'string' },
-                endTime: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    },
-
-    async (req, reply) => {
-      const { serviceId, date } = req.query
-      const slots = await controller.getAvailability(serviceId, date)
-      return reply.status(200).send(slots as never)
     },
   )
 }

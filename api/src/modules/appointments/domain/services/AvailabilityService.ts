@@ -5,6 +5,7 @@ import type { IAppointmentRepository } from '../repositories/IAppointmentReposit
 export interface AvailableSlot {
   startTime: string
   endTime: string
+  available: boolean
 }
 
 export class AvailabilityService {
@@ -25,34 +26,39 @@ export class AvailabilityService {
     const resourceIds = resources.map((r) => r.resourceId)
     const durationMs = service.durationMinutes * 60 * 1000
 
-    // gera slots de hora em hora das 09 às 18
     const slots: AvailableSlot[] = []
-    const baseDate = new Date(date)
+
+    const [year, month, day] = date.split('-').map(Number)
+    const baseDate = new Date(year, month - 1, day)
+
+    const now = new Date()
 
     for (let hour = 9; hour < 18; hour++) {
       const startTime = new Date(baseDate)
-      startTime.setUTCHours(hour, 0, 0, 0)
+      startTime.setHours(hour, 0, 0, 0)
 
       const endTime = new Date(startTime.getTime() + durationMs)
 
-      // não gera slot se o endTime ultrapassar 18:00
       const endLimit = new Date(baseDate)
-      endLimit.setUTCHours(18, 0, 0, 0)
+      endLimit.setHours(18, 0, 0, 0)
 
       if (endTime > endLimit) break
 
+      // slot no passado
+      const isPast = startTime.getTime() < now.getTime()
+
+      // slot com conflito de recursos
       const conflicts = await this.appointmentRepository.findConflictResources(
         resourceIds,
         startTime.toISOString(),
         endTime.toISOString(),
       )
 
-      if (conflicts.length === 0) {
-        slots.push({
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
-        })
-      }
+      slots.push({
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        available: !isPast && conflicts.length === 0,
+      })
     }
 
     return slots

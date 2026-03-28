@@ -28,4 +28,5 @@ export interface Resource {
   export interface AvailableSlot {
     startTime: string
     endTime: string
+    available: boolean
   }
