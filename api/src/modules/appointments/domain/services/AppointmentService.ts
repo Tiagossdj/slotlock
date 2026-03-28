@@ -54,12 +54,17 @@ export class AppointmentService {
     }
 
     // 6 - cria o agendamento
-    return await this.appointmentRepository.create({
+    const appointment = await this.appointmentRepository.create({
       userId: input.userId,
       serviceId: input.serviceId,
       startTime: input.startTime,
-      endTime: endTime,
+      endTime,
       status: 'pending',
     })
+
+    // 7 - vincula os recursos ao agendamento
+    await this.appointmentRepository.linkResources(appointment.id, resourcesIds)
+
+    return appointment
   }
 }
