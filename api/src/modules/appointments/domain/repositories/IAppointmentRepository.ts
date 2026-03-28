@@ -15,4 +15,5 @@ export interface IAppointmentRepository {
     startTime: string,
     endTime: string,
   ): Promise<{ resourceId: string }[]>
+  linkResources(appointmentId: string, resourcesIds: string[]): Promise<void>
 }

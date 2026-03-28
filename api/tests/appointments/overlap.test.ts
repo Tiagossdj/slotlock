@@ -13,6 +13,7 @@ const mockAppointmentRepository = {
   update: vi.fn(),
   delete: vi.fn(),
   findConflictResources: vi.fn(),
+  linkResources: vi.fn(),
 } as unknown as Mocked<IAppointmentRepository>
 
 const mockServiceRepository = {
@@ -40,7 +41,7 @@ const fakeAppointment = {
   serviceId: 'service-1',
   startTime: '2026-06-01T10:00:00.000Z',
   endTime: '2026-06-01T12:00:00.000Z',
-  status: 'pending',
+  status: 'pending' as const,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 }
@@ -68,6 +69,7 @@ describe('AppointmentService', () => {
       ])
       mockAppointmentRepository.findConflictResources.mockResolvedValue([])
       mockAppointmentRepository.create.mockResolvedValue(fakeAppointment)
+      mockAppointmentRepository.linkResources.mockResolvedValue(undefined)
 
       // act - executa o que está sendo testado
       const result = await service.execute({
@@ -122,6 +124,7 @@ describe('AppointmentService', () => {
 
       mockAppointmentRepository.findConflictResources.mockResolvedValue([])
       mockAppointmentRepository.create.mockResolvedValue(fakeAppointment)
+      mockAppointmentRepository.linkResources.mockResolvedValue(undefined)
 
       await service.execute({
         userId: 'user-1',

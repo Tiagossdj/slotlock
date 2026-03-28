@@ -1,8 +1,10 @@
+import fastifyCors from '@fastify/cors'
 import Fastify from 'fastify'
 import { env } from '@/config/env'
 import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
 import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes'
 import { servicesRoutes } from '@/modules/services/infra/http/services.routes'
+import { usersRoutes } from '@/modules/users/infra/http/users.routes'
 import { errorHandler } from './error-handler'
 import { swaggerPlugin } from './plugins/swagger'
 
@@ -27,6 +29,16 @@ export async function buildApp() {
   // Error Handler
   errorHandler(app)
 
+  // CORS
+  await app.register(fastifyCors, {
+    origin: [
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://localhost:3000',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  })
+
   // SWAGGER
   await app.register(swaggerPlugin)
 
@@ -34,6 +46,7 @@ export async function buildApp() {
   await app.register(resourcesRoutes, { prefix: '/api' })
   await app.register(servicesRoutes, { prefix: '/api' })
   await app.register(appointmentsRoutes, { prefix: '/api' })
+  await app.register(usersRoutes, { prefix: '/api' })
 
   return app
 }

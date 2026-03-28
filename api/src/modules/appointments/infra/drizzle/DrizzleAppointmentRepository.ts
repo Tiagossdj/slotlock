@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm'
-import { appointments } from '../../../../../db/schema'
+import { appointmentResources, appointments } from '../../../../../db/schema'
 import { db } from '../../../../infra/database/db'
 import type {
   Appointment,
@@ -52,6 +52,9 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
   }
 
   async delete(id: string): Promise<void> {
+    await db
+      .delete(appointmentResources)
+      .where(eq(appointmentResources.appointmentId, id))
     await db.delete(appointments).where(eq(appointments.id, id))
   }
 
@@ -62,22 +65,31 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
   ): Promise<{ resourceId: string }[]> {
     return await db.transaction(async (tx) => {
       const result = await tx.execute(sql`
-            SELECT ar.resource_id as "resourceId"
-            FROM appointment_resources ar
-            INNER JOIN appointments a ON a.id = ar.appointment_id
-            WHERE ar.resource_id = ANY(ARRAY[${sql.join(
-              resourceIds.map((id) => sql`${id}::uuid`),
-              sql`, `,
-            )}])
-            AND a.status != 'cancelled'
-            AND (a.start_time, a.end_time) OVERLAPS (
-                ${startTime}::timestamp,
-                ${endTime}::timestamp
-            )
-            FOR UPDATE
-            `)
+        SELECT ar.resource_id as "resourceId"
+        FROM appointment_resources ar
+        INNER JOIN appointments a ON a.id = ar.appointment_id
+        WHERE ar.resource_id = ANY(ARRAY[${sql.join(
+          resourceIds.map((id) => sql`${id}::uuid`),
+          sql`, `,
+        )}])
+        AND a.status != 'cancelled'
+        AND (a.start_time, a.end_time) OVERLAPS (
+          ${startTime}::timestamptz,
+          ${endTime}::timestamptz
+        )
+        FOR UPDATE
+      `)
 
       return result.rows as { resourceId: string }[]
     })
+  }
+
+  async linkResources(
+    appointmentId: string,
+    resourceIds: string[],
+  ): Promise<void> {
+    await db
+      .insert(appointmentResources)
+      .values(resourceIds.map((resourceId) => ({ appointmentId, resourceId })))
   }
 }

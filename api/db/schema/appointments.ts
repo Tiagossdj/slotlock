@@ -11,11 +11,11 @@ export const appointments = pgTable('appointments', {
     .notNull()
     .references(() => services.id),
   startTime: timestamp('start_time', {
-    withTimezone: false,
+    withTimezone: true,
     mode: 'string',
   }).notNull(),
   endTime: timestamp('end_time', {
-    withTimezone: false,
+    withTimezone: true,
     mode: 'string',
   }).notNull(),
   status: text('status').notNull().default('pending'), // 'pending' | 'confirmed' | 'cancelled'

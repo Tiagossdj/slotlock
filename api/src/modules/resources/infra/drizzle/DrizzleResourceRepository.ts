@@ -1,5 +1,6 @@
 import { eq, inArray } from 'drizzle-orm'
-import { resources } from '../../../../../db/schema'
+import { ConflictError } from '@/core/errors/ConflictError'
+import { resources, serviceResources } from '../../../../../db/schema'
 import { db } from '../../../../infra/database/db'
 import type {
   CreateResourceData,
@@ -55,6 +56,17 @@ export class DrizzleResourceRepository implements IResourceRepository {
   }
 
   async delete(id: string): Promise<void> {
+    const links = await db
+      .select()
+      .from(serviceResources)
+      .where(eq(serviceResources.resourceId, id))
+
+    if (links.length > 0) {
+      throw new ConflictError(
+        'Cannot delete resource — it is linked to one or more services',
+      )
+    }
+
     await db.delete(resources).where(eq(resources.id, id))
   }
 }
