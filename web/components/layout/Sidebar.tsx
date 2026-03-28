@@ -13,10 +13,10 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/Resources", label: "Resources", icon: Users },
-  { href: "/Services", label: "Services", icon: Briefcase },
-  { href: "/Appointments", label: "Appointments", icon: Calendar },
-  { href: "/Availability", label: "Availability", icon: Clock },
+  { href: "/resources", label: "Resources", icon: Users },
+  { href: "/services", label: "Services", icon: Briefcase },
+  { href: "/appointments", label: "Appointments", icon: Calendar },
+  { href: "/availability", label: "Availability", icon: Clock },
 ];
 
 export function Sidebar() {
