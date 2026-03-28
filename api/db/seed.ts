@@ -13,11 +13,15 @@ const db = drizzle(pool, { schema })
 async function seed() {
   console.log('🌱 Seeding database...')
 
-  await db.delete(schema.serviceResources)
+  // limpeza do banco na ordem correta
+  await db.delete(schema.appointmentResources)
   await db.delete(schema.appointments)
+  await db.delete(schema.serviceResources)
   await db.delete(schema.services)
   await db.delete(schema.resources)
   await db.delete(schema.users)
+
+  console.log('🧹 Database cleared')
 
   // Resources
   const [professional, room, equipment] = await db
@@ -51,13 +55,41 @@ async function seed() {
 
   console.log('✅ Service resources linked')
 
-  // User
-  await db.insert(schema.users).values([
-    { email: 'client@email.com', role: 'client' },
-    { email: 'admin@slotlock.com', role: 'admin' },
-  ])
+  // Users
+  const [client] = await db
+    .insert(schema.users)
+    .values([
+      { email: 'client@email.com', role: 'client' },
+      { email: 'admin@slotlock.com', role: 'admin' },
+    ])
+    .returning()
 
   console.log('✅ Users created')
+
+  // Appointment de exemplo
+  const startTime = '2026-06-01T10:00:00.000Z'
+  const endTime = '2026-06-01T12:00:00.000Z'
+
+  const [appointment] = await db
+    .insert(schema.appointments)
+    .values({
+      userId: client.id,
+      serviceId: lashService.id,
+      startTime,
+      endTime,
+      status: 'confirmed',
+    })
+    .returning()
+
+  // Appointment resources
+  await db.insert(schema.appointmentResources).values([
+    { appointmentId: appointment.id, resourceId: professional.id },
+    { appointmentId: appointment.id, resourceId: room.id },
+    { appointmentId: appointment.id, resourceId: equipment.id },
+  ])
+
+  console.log('✅ Appointment created')
+
   console.log('🎉 Seed completed!')
 
   await pool.end()
