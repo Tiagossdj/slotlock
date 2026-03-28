@@ -31,7 +31,11 @@ export async function buildApp() {
 
   // CORS
   await app.register(fastifyCors, {
-    origin: 'http://localhost:3001',
+    origin: [
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://localhost:3000',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 
