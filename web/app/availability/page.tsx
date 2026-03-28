@@ -1,5 +1,5 @@
 "use client";
-
+import { useUsers } from "@/lib/hooks/useUsers";
 import { useState } from "react";
 import { useServices } from "@/lib/hooks/useServices";
 import {
@@ -11,6 +11,8 @@ import { toast } from "sonner";
 
 export default function AvailabilityPage() {
   const { data: services } = useServices();
+  const {data: users} = useUsers()
+  const clientUser = users?.find(u => u.role = 'client')
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [searched, setSearched] = useState(false);
@@ -30,10 +32,9 @@ export default function AvailabilityPage() {
   }
 
   const handleBook = (startTime: string) => {
-    // userId fixo do seed por enquanto — sem autenticação
     createAppointment(
       {
-        userId: "", // será preenchido com id real quando tiver auth
+        userId: clientUser?.id ??'', 
         serviceId,
         startTime,
       },
@@ -41,6 +42,7 @@ export default function AvailabilityPage() {
         onSuccess: () => {
           toast.success("Appointment booked successfully!");
           setSelectedSlot(null);
+          refetch()
         },
         onError: (err) => toast.error(err.message),
       },

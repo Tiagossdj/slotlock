@@ -27,6 +27,8 @@ export function useCreateAppointment() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] })
+      queryClient.invalidateQueries({ queryKey: ['availability'] })
+
     },
   })
 }
