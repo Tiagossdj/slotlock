@@ -30,14 +30,16 @@ export default function ResourcesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim()) return
     createResource(form, {
       onSuccess: () => {
-        setForm({ name: "", type: "professional" });
-        setShowForm(false);
+        setForm({ name: '', type: 'professional' })
+        setShowForm(false)
+        toast.success('Resource created successfully!')
       },
-    });
-  };
+      onError: (err) => toast.error(err.message),
+    })
+  }
 
   const handleDelete = () => {
     if (!deleteId) return;

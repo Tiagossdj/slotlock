@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import {
   useAppointments,
+  useCreateAppointment,
   useUpdateAppointmentStatus,
   useDeleteAppointment,
 } from '@/lib/hooks/useAppointments'
 import { useServices } from '@/lib/hooks/useServices'
+import { useUsers } from '@/lib/hooks/useUsers'
 import { Plus, Trash2 } from 'lucide-react'
 import type { Appointment } from '@/lib/types'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -21,10 +23,36 @@ const statusColors = {
 export default function AppointmentsPage() {
   const { data: appointments, isLoading } = useAppointments()
   const { data: services } = useServices()
+  const { data: users } = useUsers()
+  const { mutate: createAppointment, isPending: isCreating } = useCreateAppointment()
   const { mutate: updateStatus } = useUpdateAppointmentStatus()
   const { mutate: deleteAppointment, isPending: isDeleting } = useDeleteAppointment()
 
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ userId: '', serviceId: '', startTime: '' })
   const [deleteId, setDeleteId] = useState<string | null>(null)
+
+  const getUserEmail = (userId: string) =>
+    users?.find((u) => u.id === userId)?.email ?? userId
+
+  const getServiceName = (serviceId: string) =>
+    services?.find((s) => s.id === serviceId)?.name ?? serviceId
+
+  const handleSubmit = () => {
+    if (!form.userId || !form.serviceId || !form.startTime) return
+    
+    // converte datetime-local para UTC ISO string
+    const startTimeUTC = new Date(form.startTime).toISOString()
+    
+    createAppointment({ ...form, startTime: startTimeUTC }, {
+      onSuccess: () => {
+        setForm({ userId: '', serviceId: '', startTime: '' })
+        setShowForm(false)
+        toast.success('Appointment created successfully!')
+      },
+      onError: (err) => toast.error(err.message),
+    })
+  }
 
   const handleStatusChange = (id: string, status: Appointment['status']) => {
     updateStatus({ id, status }, {
@@ -47,9 +75,6 @@ export default function AppointmentsPage() {
     })
   }
 
-  const getServiceName = (serviceId: string) =>
-    services?.find((s) => s.id === serviceId)?.name ?? serviceId
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -57,7 +82,72 @@ export default function AppointmentsPage() {
           <h1 className="text-3xl font-bold text-foreground">Appointments</h1>
           <p className="text-muted-foreground mt-1">Manage and track all bookings</p>
         </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          <Plus size={16} />
+          New Appointment
+        </button>
       </div>
+
+      {showForm && (
+        <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">New Appointment</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm text-muted-foreground">User</label>
+              <select
+                value={form.userId}
+                onChange={(e) => setForm({ ...form, userId: e.target.value })}
+                className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                <option value="">Select a user</option>
+                {users?.map((u) => (
+                  <option key={u.id} value={u.id}>{u.email}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm text-muted-foreground">Service</label>
+              <select
+                value={form.serviceId}
+                onChange={(e) => setForm({ ...form, serviceId: e.target.value })}
+                className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                <option value="">Select a service</option>
+                {services?.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm text-muted-foreground">Date & Time</label>
+              <input
+                type="datetime-local"
+                value={form.startTime}
+                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleSubmit}
+              disabled={isCreating}
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {isCreating ? 'Creating...' : 'Create Appointment'}
+            </button>
+            <button
+              onClick={() => setShowForm(false)}
+              className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="space-y-4">
@@ -75,8 +165,7 @@ export default function AppointmentsPage() {
             <div key={apt.id} className="bg-card border border-border rounded-lg p-6 group">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="font-semibold text-foreground">{apt.userId}</p>
-                  <p className="text-sm text-muted-foreground">{apt.userId}</p>
+                  <p className="font-semibold text-foreground">{getUserEmail(apt.userId)}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${statusColors[apt.status]}`}>

@@ -8,6 +8,7 @@ import {
 } from "@/lib/hooks/useServices";
 import { Plus, Trash2, Clock } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 export default function ServicesPage() {
   const { data: services, isLoading } = useServices();
@@ -19,19 +20,28 @@ export default function ServicesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim()) return
     createService(form, {
       onSuccess: () => {
-        setForm({ name: "", durationMinutes: 60 });
-        setShowForm(false);
+        setForm({ name: '', durationMinutes: 60 })
+        setShowForm(false)
+        toast.success('Service created successfully!')
       },
-    });
-  };
+      onError: (err) => toast.error(err.message),
+    })
+  }
 
   const handleDelete = () => {
     if (!deleteId) return;
     deleteService(deleteId, {
-      onSuccess: () => setDeleteId(null),
+      onSuccess: () => {
+        setDeleteId(null);
+        toast.success("Service deleted successfully");
+      },
+      onError: (err) => {
+        setDeleteId(null);
+        toast.error(err.message);
+      },
     });
   };
 
