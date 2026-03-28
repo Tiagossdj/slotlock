@@ -4,6 +4,7 @@ import { env } from '@/config/env'
 import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
 import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes'
 import { servicesRoutes } from '@/modules/services/infra/http/services.routes'
+import { usersRoutes } from '@/modules/users/infra/http/users.routes'
 import { errorHandler } from './error-handler'
 import { swaggerPlugin } from './plugins/swagger'
 
@@ -41,6 +42,7 @@ export async function buildApp() {
   await app.register(resourcesRoutes, { prefix: '/api' })
   await app.register(servicesRoutes, { prefix: '/api' })
   await app.register(appointmentsRoutes, { prefix: '/api' })
+  await app.register(usersRoutes, { prefix: '/api' })
 
   return app
 }
