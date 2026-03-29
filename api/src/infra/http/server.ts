@@ -36,6 +36,7 @@ export async function buildApp() {
       'http://127.0.0.1:3000',
       'http://localhost:3000',
       'https://slotlock.up.railway.app/',
+      'https://slotlock-web.vercel.app/',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
