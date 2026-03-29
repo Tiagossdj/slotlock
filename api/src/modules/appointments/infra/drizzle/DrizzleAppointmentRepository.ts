@@ -63,13 +63,15 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
     startTime: string,
     endTime: string,
   ): Promise<{ resourceId: string }[]> {
+    const sortedResourceIds = [...resourceIds].sort()
+
     return await db.transaction(async (tx) => {
       const result = await tx.execute(sql`
         SELECT ar.resource_id as "resourceId"
         FROM appointment_resources ar
         INNER JOIN appointments a ON a.id = ar.appointment_id
         WHERE ar.resource_id = ANY(ARRAY[${sql.join(
-          resourceIds.map((id) => sql`${id}::uuid`),
+          sortedResourceIds.map((id) => sql`${id}::uuid`),
           sql`, `,
         )}])
         AND a.status != 'cancelled'
@@ -77,6 +79,7 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
           ${startTime}::timestamptz,
           ${endTime}::timestamptz
         )
+        ORDER BY ar.resource_id ASC
         FOR UPDATE
       `)
 
