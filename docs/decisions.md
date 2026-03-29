@@ -65,6 +65,15 @@ This document explains the reasoning behind important architectural choices in S
 
 ---
 
+## Deadlock Prevention
+
+To prevent deadlocks when locking multiple resources simultaneously with `FOR UPDATE`,
+the system sorts all resource ID arrays alphabetically before executing the query.
+This forces PostgreSQL to always acquire locks in the same predictable sequence,
+making deadlocks impossible regardless of request order.
+
+---
+
 ## Manual Dependency Injection
 
 **Decision:** instantiate and inject dependencies manually in the HTTP layer.
