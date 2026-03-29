@@ -13,10 +13,7 @@ export const swaggerPlugin = fp(async (app: FastifyInstance) => {
       },
       servers: [
         {
-          url:
-            process.env.NODE_ENV === 'production'
-              ? 'https://slotlock-api.up.railway.app'
-              : 'http://localhost:3000',
+          url: process.env.RAILWAY_PUBLIC_URL ?? 'http://localhost:3000',
         },
       ],
     },
