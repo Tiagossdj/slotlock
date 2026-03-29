@@ -1,90 +1,104 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 import {
   useAppointments,
   useCreateAppointment,
   useUpdateAppointmentStatus,
   useDeleteAppointment,
-} from '@/lib/hooks/useAppointments'
-import { useServices } from '@/lib/hooks/useServices'
-import { useUsers } from '@/lib/hooks/useUsers'
-import { Plus, Trash2 } from 'lucide-react'
-import type { Appointment } from '@/lib/types'
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { toast } from 'sonner'
+} from "@/lib/hooks/useAppointments";
+import { useServices } from "@/lib/hooks/useServices";
+import { useUsers } from "@/lib/hooks/useUsers";
+import { Plus, Trash2 } from "lucide-react";
+import type { Appointment } from "@/lib/types";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 const statusColors = {
-  pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  confirmed: 'bg-green-500/20 text-green-400 border-green-500/30',
-  cancelled: 'bg-red-500/20 text-red-400 border-red-500/30',
-}
+  pending: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  confirmed: "bg-green-500/20 text-green-400 border-green-500/30",
+  cancelled: "bg-red-500/20 text-red-400 border-red-500/30",
+};
 
 export default function AppointmentsPage() {
-  const { data: appointments, isLoading } = useAppointments()
-  const { data: services } = useServices()
-  const { data: users } = useUsers()
-  const { mutate: createAppointment, isPending: isCreating } = useCreateAppointment()
-  const { mutate: updateStatus } = useUpdateAppointmentStatus()
-  const { mutate: deleteAppointment, isPending: isDeleting } = useDeleteAppointment()
+  const { data: appointments, isLoading } = useAppointments();
+  const { data: services } = useServices();
+  const { data: users } = useUsers();
+  const { mutate: createAppointment, isPending: isCreating } =
+    useCreateAppointment();
+  const { mutate: updateStatus } = useUpdateAppointmentStatus();
+  const { mutate: deleteAppointment, isPending: isDeleting } =
+    useDeleteAppointment();
 
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ userId: '', serviceId: '', startTime: '' })
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({
+    userId: "",
+    serviceId: "",
+    startTime: "",
+  });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const getUserEmail = (userId: string) =>
-    users?.find((u) => u.id === userId)?.email ?? userId
+    users?.find((u) => u.id === userId)?.email ?? userId;
 
   const getServiceName = (serviceId: string) =>
-    services?.find((s) => s.id === serviceId)?.name ?? serviceId
+    services?.find((s) => s.id === serviceId)?.name ?? serviceId;
 
   const handleSubmit = () => {
-    if (!form.userId || !form.serviceId || !form.startTime) return
-    
-    // converte datetime-local para UTC ISO string
-    const startTimeUTC = new Date(form.startTime).toISOString()
-    
-    createAppointment({ ...form, startTime: startTimeUTC }, {
-      onSuccess: () => {
-        setForm({ userId: '', serviceId: '', startTime: '' })
-        setShowForm(false)
-        toast.success('Appointment created successfully!')
-      },
-      onError: (err) => toast.error(err.message),
-    })
-  }
+    if (!form.userId || !form.serviceId || !form.startTime) return;
 
-  const handleStatusChange = (id: string, status: Appointment['status']) => {
-    updateStatus({ id, status }, {
-      onSuccess: () => toast.success('Status updated'),
-      onError: (err) => toast.error(err.message),
-    })
-  }
+    // converte datetime-local para UTC ISO string
+    const startTimeUTC = new Date(form.startTime).toISOString();
+
+    createAppointment(
+      { ...form, startTime: startTimeUTC },
+      {
+        onSuccess: () => {
+          setForm({ userId: "", serviceId: "", startTime: "" });
+          setShowForm(false);
+          toast.success("Appointment created successfully!");
+        },
+        onError: (err) => toast.error(err.message),
+      },
+    );
+  };
+
+  const handleStatusChange = (id: string, status: Appointment["status"]) => {
+    updateStatus(
+      { id, status },
+      {
+        onSuccess: () => toast.success("Status updated"),
+        onError: (err) => toast.error(err.message),
+      },
+    );
+  };
 
   const handleDelete = () => {
-    if (!deleteId) return
+    if (!deleteId) return;
     deleteAppointment(deleteId, {
       onSuccess: () => {
-        setDeleteId(null)
-        toast.success('Appointment deleted')
+        setDeleteId(null);
+        toast.success("Appointment deleted");
       },
       onError: (err) => {
-        setDeleteId(null)
-        toast.error(err.message)
+        setDeleteId(null);
+        toast.error(err.message);
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Appointments</h1>
-          <p className="text-muted-foreground mt-1">Manage and track all bookings</p>
+          <p className="text-muted-foreground mt-1">
+            Manage and track all bookings
+          </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity w-full sm:w-auto justify-center"
         >
           <Plus size={16} />
           New Appointment
@@ -93,7 +107,9 @@ export default function AppointmentsPage() {
 
       {showForm && (
         <div className="bg-card border border-border rounded-lg p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">New Appointment</h2>
+          <h2 className="text-lg font-semibold text-foreground">
+            New Appointment
+          </h2>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm text-muted-foreground">User</label>
@@ -104,7 +120,9 @@ export default function AppointmentsPage() {
               >
                 <option value="">Select a user</option>
                 {users?.map((u) => (
-                  <option key={u.id} value={u.id}>{u.email}</option>
+                  <option key={u.id} value={u.id}>
+                    {u.email}
+                  </option>
                 ))}
               </select>
             </div>
@@ -112,21 +130,29 @@ export default function AppointmentsPage() {
               <label className="text-sm text-muted-foreground">Service</label>
               <select
                 value={form.serviceId}
-                onChange={(e) => setForm({ ...form, serviceId: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, serviceId: e.target.value })
+                }
                 className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               >
                 <option value="">Select a service</option>
                 {services?.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm text-muted-foreground">Date & Time</label>
+              <label className="text-sm text-muted-foreground">
+                Date & Time
+              </label>
               <input
                 type="datetime-local"
                 value={form.startTime}
-                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, startTime: e.target.value })
+                }
                 className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
@@ -137,7 +163,7 @@ export default function AppointmentsPage() {
               disabled={isCreating}
               className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {isCreating ? 'Creating...' : 'Create Appointment'}
+              {isCreating ? "Creating..." : "Create Appointment"}
             </button>
             <button
               onClick={() => setShowForm(false)}
@@ -152,7 +178,10 @@ export default function AppointmentsPage() {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-card border border-border rounded-lg p-6 animate-pulse h-32" />
+            <div
+              key={i}
+              className="bg-card border border-border rounded-lg p-6 animate-pulse h-32"
+            />
           ))}
         </div>
       ) : appointments?.length === 0 ? (
@@ -162,13 +191,20 @@ export default function AppointmentsPage() {
       ) : (
         <div className="space-y-4">
           {appointments?.map((apt) => (
-            <div key={apt.id} className="bg-card border border-border rounded-lg p-6 group">
+            <div
+              key={apt.id}
+              className="bg-card border border-border rounded-lg p-6 group"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="font-semibold text-foreground">{getUserEmail(apt.userId)}</p>
+                  <p className="font-semibold text-foreground">
+                    {getUserEmail(apt.userId)}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${statusColors[apt.status]}`}>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full border font-medium ${statusColors[apt.status]}`}
+                  >
                     {apt.status}
                   </span>
                   <button
@@ -183,10 +219,14 @@ export default function AppointmentsPage() {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Service</p>
-                  <p className="text-sm text-foreground">{getServiceName(apt.serviceId)}</p>
+                  <p className="text-sm text-foreground">
+                    {getServiceName(apt.serviceId)}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Date & Time</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Date & Time
+                  </p>
                   <p className="text-sm text-foreground">
                     {new Date(apt.startTime).toLocaleString()}
                   </p>
@@ -196,14 +236,21 @@ export default function AppointmentsPage() {
               <div className="flex items-center gap-3 pt-4 border-t border-border">
                 <select
                   value={apt.status}
-                  onChange={(e) => handleStatusChange(apt.id, e.target.value as Appointment['status'])}
+                  onChange={(e) =>
+                    handleStatusChange(
+                      apt.id,
+                      e.target.value as Appointment["status"],
+                    )
+                  }
                   className="bg-secondary border border-border rounded-md px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                 >
                   <option value="pending">Pending</option>
                   <option value="confirmed">Confirmed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                <span className="text-xs text-muted-foreground">Change appointment status</span>
+                <span className="text-xs text-muted-foreground">
+                  Change appointment status
+                </span>
               </div>
             </div>
           ))}
@@ -219,5 +266,5 @@ export default function AppointmentsPage() {
         isPending={isDeleting}
       />
     </div>
-  )
+  );
 }
