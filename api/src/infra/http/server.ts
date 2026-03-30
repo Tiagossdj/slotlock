@@ -6,6 +6,7 @@ import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes
 import { servicesRoutes } from '@/modules/services/infra/http/services.routes'
 import { usersRoutes } from '@/modules/users/infra/http/users.routes'
 import { errorHandler } from './error-handler'
+import jwtPlugin from './plugins/jwt'
 import { swaggerPlugin } from './plugins/swagger'
 
 const isDev = env.NODE_ENV === 'development'
@@ -43,6 +44,9 @@ export async function buildApp() {
 
   // SWAGGER
   await app.register(swaggerPlugin)
+
+  // AUTH
+  await app.register(jwtPlugin)
 
   // ROUTES
   await app.register(resourcesRoutes, { prefix: '/api' })
