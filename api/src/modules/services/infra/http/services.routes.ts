@@ -33,8 +33,10 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'List all services',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         response: { 200: { type: 'array', items: serviceResponseSchema } },
       },
+      onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {
       const services = await controller.findAll()
@@ -48,9 +50,11 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Get service by ID',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         response: { 200: serviceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {
       const service = await controller.findById(req.params.id)
@@ -64,9 +68,11 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Create a service',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         body: createServiceBodySchema,
         response: { 201: serviceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       const service = await controller.create(req.body)
@@ -80,10 +86,12 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Update a service',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         body: updateServiceBodySchema,
         response: { 200: serviceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       const service = await controller.update(req.params.id, req.body)
@@ -97,9 +105,11 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Delete a service',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         response: { 204: { type: 'null' } },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       await controller.delete(req.params.id)

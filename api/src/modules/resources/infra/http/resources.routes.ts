@@ -34,8 +34,10 @@ export async function resourcesRoutes(app: AppInstance) {
       schema: {
         summary: 'List all resources',
         tags: ['Resources'],
+        security: [{ bearerAuth: [] }],
         response: { 200: { type: 'array', items: resourceResponseSchema } },
       },
+      onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {
       const resources = await controller.findAll()
@@ -49,31 +51,34 @@ export async function resourcesRoutes(app: AppInstance) {
       schema: {
         summary: 'Get resource by ID',
         tags: ['Resources'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         response: { 200: resourceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {
-      const resource = await controller.findById(req.params.id)
-      return reply.status(200).send(resource)
+      const resources = await controller.findById(req.params.id)
+      return reply.status(200).send(resources)
     },
-  )
-
-  app.post(
-    '/resources',
-    {
-      schema: {
-        summary: 'Create a resource',
-        tags: ['Resources'],
-        body: createResourceBodySchema,
-        response: { 201: resourceResponseSchema },
+  ),
+    app.post(
+      '/resources',
+      {
+        schema: {
+          summary: 'Create a resource',
+          tags: ['Resources'],
+          security: [{ bearerAuth: [] }],
+          body: createResourceBodySchema,
+          response: { 201: resourceResponseSchema },
+        },
+        onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
       },
-    },
-    async (req, reply) => {
-      const resource = await controller.create(req.body)
-      return reply.status(201).send(resource)
-    },
-  )
+      async (req, reply) => {
+        const resource = await controller.create(req.body)
+        return reply.status(201).send(resource)
+      },
+    )
 
   app.put(
     '/resources/:id',
@@ -81,10 +86,12 @@ export async function resourcesRoutes(app: AppInstance) {
       schema: {
         summary: 'Update a resource',
         tags: ['Resources'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         body: updateResourceBodySchema,
         response: { 200: resourceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       const resource = await controller.update(req.params.id, req.body)
@@ -98,9 +105,11 @@ export async function resourcesRoutes(app: AppInstance) {
       schema: {
         summary: 'Delete a resource',
         tags: ['Resources'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         response: { 204: { type: 'null' } },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       await controller.delete(req.params.id)
