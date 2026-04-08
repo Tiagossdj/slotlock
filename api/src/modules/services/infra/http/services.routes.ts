@@ -33,10 +33,8 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'List all services',
         tags: ['Services'],
-        security: [{ bearerAuth: [] }],
         response: { 200: { type: 'array', items: serviceResponseSchema } },
       },
-      onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {
       const services = await controller.findAll()
@@ -50,11 +48,9 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Get service by ID',
         tags: ['Services'],
-        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         response: { 200: serviceResponseSchema },
       },
-      onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {
       const service = await controller.findById(req.params.id)
