@@ -22,7 +22,7 @@ import {
 import { useLogout } from "@/lib/hooks/useAuth";
 import { getUser } from "@/lib/auth";
 
-const navItems = [
+const adminNavItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/resources", label: "Resources", icon: Users },
   { href: "/services", label: "Services", icon: Briefcase },
@@ -30,10 +30,16 @@ const navItems = [
   { href: "/availability", label: "Availability", icon: Clock },
 ];
 
+const clientNavItems = [
+  { href: "/availability", label: "Availability", icon: Clock },
+  { href: "/my-appointments", label: "Meus Agendamentos", icon: Calendar },
+];
+
 function NavContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const logout = useLogout();
   const user = getUser();
+  const navItems = user?.role === "admin" ? adminNavItems : clientNavItems;
 
   return (
     <div className="flex flex-col h-full">
@@ -75,8 +81,12 @@ function NavContent({ onClose }: { onClose?: () => void }) {
       <div className="p-4 border-t border-border space-y-3">
         {user && (
           <div className="space-y-0.5">
-            <p className="text-xs font-medium text-foreground truncate">{user.email}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+            <p className="text-xs font-medium text-foreground truncate">
+              {user.email}
+            </p>
+            <p className="text-xs text-muted-foreground capitalize">
+              {user.role}
+            </p>
           </div>
         )}
         <button
