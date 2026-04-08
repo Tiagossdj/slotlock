@@ -30,3 +30,16 @@ export interface Resource {
     endTime: string
     available: boolean
   }
+
+  export interface User {
+    id: string
+    email: string
+    role: 'client' | 'admin'
+    createdAt: string
+    updatedAt: string
+  }
+  
+  export interface AuthResponse {
+    token: string
+    user: User
+  }
