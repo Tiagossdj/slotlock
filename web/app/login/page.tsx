@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useLogin } from '@/lib/hooks/useAuth'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -67,6 +68,13 @@ export default function LoginPage() {
           >
             {login.isPending ? 'Entrando...' : 'Entrar'}
           </button>
+
+              <p className="text-center text-sm text-muted-foreground">
+                Não tem uma conta?{' '}
+              <Link href="/register" className="text-primary hover:underline font-medium">
+                Criar conta
+              </Link>
+              </p>
         </form>
       </div>
     </div>
