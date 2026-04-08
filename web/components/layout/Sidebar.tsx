@@ -10,6 +10,7 @@ import {
   Calendar,
   Clock,
   Menu,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -18,6 +19,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useLogout } from "@/lib/hooks/useAuth";
+import { getUser } from "@/lib/auth";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -29,6 +32,8 @@ const navItems = [
 
 function NavContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const logout = useLogout();
+  const user = getUser();
 
   return (
     <div className="flex flex-col h-full">
@@ -67,10 +72,20 @@ function NavContent({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      <div className="p-4 border-t border-border">
-        <p className="text-xs text-muted-foreground">
-          API: slotlock.up.railway.app
-        </p>
+      <div className="p-4 border-t border-border space-y-3">
+        {user && (
+          <div className="space-y-0.5">
+            <p className="text-xs font-medium text-foreground truncate">{user.email}</p>
+            <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+          </div>
+        )}
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+        >
+          <LogOut size={16} />
+          Sair
+        </button>
       </div>
     </div>
   );
