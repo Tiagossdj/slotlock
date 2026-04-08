@@ -2,6 +2,7 @@ import fastifyCors from '@fastify/cors'
 import Fastify from 'fastify'
 import { env } from '@/config/env'
 import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
+import { authRoutes } from '@/modules/auth/infra/http/auth.routes'
 import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes'
 import { servicesRoutes } from '@/modules/services/infra/http/services.routes'
 import { usersRoutes } from '@/modules/users/infra/http/users.routes'
@@ -53,6 +54,7 @@ export async function buildApp() {
   await app.register(servicesRoutes, { prefix: '/api' })
   await app.register(appointmentsRoutes, { prefix: '/api' })
   await app.register(usersRoutes, { prefix: '/api' })
+  await app.register(authRoutes, { prefix: '/api' })
 
   return app
 }
