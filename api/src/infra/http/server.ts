@@ -43,6 +43,7 @@ export async function buildApp() {
       'https://slotlock-web.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   })
 
   // RATE LIMIT — global
