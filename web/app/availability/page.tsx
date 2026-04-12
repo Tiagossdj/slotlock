@@ -8,6 +8,7 @@ import {
 import { Search, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function AvailabilityPage() {
   const { data: services } = useServices();
@@ -15,7 +16,7 @@ export default function AvailabilityPage() {
   const [date, setDate] = useState("");
   const [searched, setSearched] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-
+  const router = useRouter()
   const { data: slots, isLoading, refetch } = useAvailability(serviceId, date);
   const { mutate: createAppointment, isPending: isBooking } =
     useCreateAppointment();
@@ -28,11 +29,13 @@ export default function AvailabilityPage() {
     setSelectedSlot(null);
     refetch()
   }
+  
 
   const handleBook = (startTime: string) => {
     const user = getUser()
     if (!user) {
       toast.error('Você precisa estar logado para agendar')
+      router.push('/login?redirect=/availability')
       return
     }
   
