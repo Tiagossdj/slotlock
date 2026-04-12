@@ -35,6 +35,7 @@ const authResponseSchema = {
           role: { type: 'string' },
         },
       },
+      token: { type: 'string' },
     },
   },
 }
@@ -66,11 +67,11 @@ export async function authRoutes(app: AppInstance) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        maxAge: 60 * 60 * 24 * 7, // 7 dias em segundos
+        maxAge: 60 * 60 * 24 * 7,
         path: '/',
       })
 
-      return reply.send({ user })
+      return reply.send({ user, token })
     },
   )
 
@@ -100,7 +101,7 @@ export async function authRoutes(app: AppInstance) {
         path: '/',
       })
 
-      return reply.send({ user })
+      return reply.send({ user, token })
     },
   )
 

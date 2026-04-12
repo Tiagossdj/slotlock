@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 import { apiFetch } from '../api'
 import { setAuth, clearAuth } from '../auth'
 import type { User } from '../types'
@@ -17,37 +16,35 @@ export function useMe() {
 }
 
 export function useLogin() {
-  const router = useRouter()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: LoginInput) =>
-      apiFetch<{ user: User }>('/api/auth/login', {
+      apiFetch<{ user: User; token: string }>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    onSuccess: ({ user }) => {
-      setAuth(user) // salva só os dados, sem token
-      queryClient.setQueryData(['me'], user) // evita refetch desnecessário
-      router.push(user.role === 'admin' ? '/' : '/availability')
+    onSuccess: ({ user, token }) => {
+      localStorage.setItem('slotlock_token', token)
+      setAuth(user)
+      queryClient.setQueryData(['me'], user)
     },
   })
 }
 
 export function useRegister() {
-  const router = useRouter()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: RegisterInput) =>
-      apiFetch<{ user: User }>('/api/auth/register', {
+      apiFetch<{ user: User; token: string }>('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    onSuccess: ({ user }) => {
+    onSuccess: ({ user, token }) => {
+      localStorage.setItem('slotlock_token', token)
       setAuth(user)
       queryClient.setQueryData(['me'], user)
-      router.push('/availability')
     },
   })
 }
@@ -57,8 +54,9 @@ export function useLogout() {
 
   return async function logout() {
     await apiFetch('/api/auth/logout', { method: 'POST', body: JSON.stringify({}) }).catch(() => {})
+    localStorage.removeItem('slotlock_token') // ← limpa o localStorage
     clearAuth()
-    queryClient.clear() 
+    queryClient.clear()
     window.location.href = '/login'
   }
 }
