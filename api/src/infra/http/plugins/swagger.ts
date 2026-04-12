@@ -14,12 +14,13 @@ export const swaggerPlugin = fp(async (app: FastifyInstance) => {
       },
       servers: [
         {
-          url: 'http://localhost:3000',
-          description: 'Ambiente de Desenvolvimento (Local)',
-        },
-        {
           url: env.RAILWAY_PUBLIC_URL,
           description: 'Servidor de Produção (Railway)',
+        },
+
+        {
+          url: 'http://localhost:3000',
+          description: 'Ambiente de Desenvolvimento (Local)',
         },
       ],
       components: {

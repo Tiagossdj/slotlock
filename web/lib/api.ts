@@ -1,10 +1,11 @@
-export async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
+
+export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const hasBody = options?.body !== undefined
 
-  
-  const res = await fetch(url, {
+  const res = await fetch(`${API_URL}${path}`, {
     ...options,
-    credentials: 'include', // envia o cookie httpOnly em todo request
+    credentials: 'include',
     headers: {
       ...(hasBody && { 'Content-Type': 'application/json' }),
       ...options?.headers,
