@@ -20,6 +20,7 @@ export function LoginForm() {
     login.mutate({ email, password }, {
       onSuccess: ({ user }) => {
         router.push(redirect ?? (user.role === 'admin' ? '/' : '/availability'))
+        router.refresh()
       }
     })
   }
