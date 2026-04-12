@@ -292,7 +292,7 @@ SlotLock uses **JWT with httpOnly cookies** — the token is never accessible to
 3. `GET /api/auth/me` — reads the cookie server-side, returns the authenticated user
 4. `POST /api/auth/logout` — clears the cookie on the server
 
-The frontend stores only `{ email, role }` in localStorage for UI purposes. The token never touches the client.
+> **Note:** In the deployed version (Vercel + Railway), the JWT token is stored in `localStorage` due to cross-origin cookie restrictions. See [Known Limitations](#known-limitations).
 
 ### Rate Limiting
 
