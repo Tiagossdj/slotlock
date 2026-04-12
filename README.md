@@ -24,6 +24,9 @@
 - [Seed Data](#seed-data)
 - [Next Steps](#next-steps)
 - [Learn More](#learn-more)
+- [Known Limitations](#known-limitations)
+
+
 
 ---
 
@@ -443,5 +446,13 @@ Technical decisions, architecture details and known trade-offs are documented in
 - [`ai-context.md`](./api/docs/ai-context.md) — context for AI coding tools
 
 ---
+
+## Known Limitations
+
+### Authentication Storage
+JWT tokens are stored in `localStorage` due to cross-origin restrictions between 
+the deployment platforms (Vercel/Railway). In a production environment with a 
+custom domain, the recommendation would be to use `httpOnly` cookies with 
+`SameSite: Strict` for better security against XSS attacks.
 
 ⭐ If this project helped you, leave a star!

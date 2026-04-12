@@ -204,3 +204,11 @@ export type AppInstance = FastifyInstance<
 - Centralizes the type provider configuration
 
 **What was considered:** using `withTypeProvider<JsonSchemaToTsProvider>()` inside each route function. This caused the Swagger plugin to not detect routes registered in a different encapsulation context, resulting in empty `paths` in the OpenAPI spec.
+
+## Known Limitations
+
+### Authentication Storage
+JWT tokens are stored in `localStorage` due to cross-origin restrictions between 
+the deployment platforms (Vercel/Railway). In a production environment with a 
+custom domain, the recommendation would be to use `httpOnly` cookies with 
+`SameSite: Strict` for better security against XSS attacks.
