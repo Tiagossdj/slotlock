@@ -9,6 +9,11 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?logo=postgresql)](https://www.postgresql.org/)
 
 ---
+## 🔗 Live Demo
+- **Frontend:** https://slotlock-web.vercel.app
+- **API Docs:** https://slotlock.up.railway.app/docs
+
+---
 
 ## 📑 Table of Contents
 
