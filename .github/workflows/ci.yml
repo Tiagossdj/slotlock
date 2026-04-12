@@ -45,13 +45,25 @@ jobs:
         working-directory: api
         run: pnpm biome check .
 
-      - name: Run migrations
+      - name: Create test database
+        run: PGPASSWORD=password psql -h localhost -p 5433 -U user -d slotlock -c "CREATE DATABASE slotlock_test;"
+
+      - name: Run migrations (dev)
         working-directory: api
         env:
           DATABASE_URL: postgresql://user:password@localhost:5433/slotlock
           PORT: 3000
           HOST: 0.0.0.0
-          NODE_ENV: test
+          NODE_ENV: development
+        run: pnpm drizzle-kit migrate
+
+      - name: Run migrations (test)
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5433/slotlock_test
+          PORT: 3000
+          HOST: 0.0.0.0
+          NODE_ENV: development
         run: pnpm drizzle-kit migrate
 
       - name: Run tests
@@ -60,5 +72,7 @@ jobs:
           DATABASE_URL: postgresql://user:password@localhost:5433/slotlock
           PORT: 3000
           HOST: 0.0.0.0
+          JWT_SECRET: test-secret
+          RAILWAY_PUBLIC_URL: http://localhost:3000
           NODE_ENV: test
         run: pnpm test:run
