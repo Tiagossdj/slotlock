@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { apiFetch } from '../api'
 import { setAuth, clearAuth } from '../auth'
 import type { User } from '../types'
@@ -18,7 +18,6 @@ export function useMe() {
 
 export function useLogin() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -30,8 +29,7 @@ export function useLogin() {
     onSuccess: ({ user }) => {
       setAuth(user) // salva só os dados, sem token
       queryClient.setQueryData(['me'], user) // evita refetch desnecessário
-      const redirect = searchParams.get('redirect')
-      router.push(redirect ?? (user.role === 'admin' ? '/' : '/availability'))
+      router.push(user.role === 'admin' ? '/' : '/availability')
     },
   })
 }

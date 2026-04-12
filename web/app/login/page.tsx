@@ -1,17 +1,25 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useLogin } from '@/lib/hooks/useAuth'
 import Link from 'next/link'
 
-export default function LoginPage() {
+export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect')
   const login = useLogin()
 
-  function handleSubmit(e: React.SubmitEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    login.mutate({ email, password })
+    login.mutate({ email, password }, {
+      onSuccess: ({ user }) => {
+        window.location.href = redirect ?? (user.role === 'admin' ? '/' : '/availability')
+      }
+    })
   }
 
   return (
@@ -78,5 +86,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <LoginForm />
+    </Suspense>
   )
 }
