@@ -1,3 +1,4 @@
+import fastifyCookie from '@fastify/cookie'
 import type { AppInstance } from '@/@types/fastify'
 import { DrizzleUserRepository } from '../../../users/infra/drizzle/DrizzleUserRepository'
 import { AuthService } from '../../domain/services/AuthService'
@@ -26,7 +27,6 @@ const authResponseSchema = {
   200: {
     type: 'object',
     properties: {
-      token: { type: 'string' },
       user: {
         type: 'object',
         properties: {
@@ -47,6 +47,12 @@ export async function authRoutes(app: AppInstance) {
   app.post(
     '/auth/register',
     {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute',
+        },
+      },
       schema: {
         body: registerBodySchema,
         response: authResponseSchema,
@@ -54,14 +60,29 @@ export async function authRoutes(app: AppInstance) {
       },
     },
     async (req, reply) => {
-      const result = await authController.register(req.body)
-      return reply.send(result)
+      const { token, user } = await authController.register(req.body)
+
+      reply.setCookie('slotlock_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 7, // 7 dias em segundos
+        path: '/',
+      })
+
+      return reply.send({ user })
     },
   )
 
   app.post(
     '/auth/login',
     {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute',
+        },
+      },
       schema: {
         body: loginBodySchema,
         response: authResponseSchema,
@@ -69,22 +90,38 @@ export async function authRoutes(app: AppInstance) {
       },
     },
     async (req, reply) => {
-      const result = await authController.login(req.body)
-      return reply.send(result)
+      const { token, user } = await authController.login(req.body)
+
+      reply.setCookie('slotlock_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      })
+
+      return reply.send({ user })
+    },
+  )
+
+  app.post(
+    '/auth/logout',
+    { schema: { tags: ['auth'] } },
+    async (req, reply) => {
+      reply.clearCookie('slotlock_token', {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      })
+      return reply.send({ ok: true })
     },
   )
 
   app.get(
     '/auth/me',
     {
-      schema: {
-        tags: ['auth'],
-        security: [{ bearerAuth: [] }],
-        response: {
-          200: authResponseSchema[200].properties.user,
-        },
-      },
-
+      schema: { tags: ['auth'] },
       onRequest: [async (req, reply) => await app.authenticate(req, reply)],
     },
     async (req, reply) => {

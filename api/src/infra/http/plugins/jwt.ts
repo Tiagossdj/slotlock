@@ -2,7 +2,6 @@ import fastifyJwt from '@fastify/jwt'
 import type { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
 import { env } from '@/config/env'
-
 import { authenticate, requireAdmin } from '../hooks/authenticate'
 
 async function jwtPlugin(app: FastifyInstance) {

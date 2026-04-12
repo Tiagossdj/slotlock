@@ -20,6 +20,17 @@ const serviceResponseSchema = {
     durationMinutes: { type: 'number' },
     createdAt: { type: 'string' },
     updatedAt: { type: 'string' },
+    resources: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          type: { type: 'string' },
+        },
+      },
+    },
   },
 }
 

@@ -1,4 +1,6 @@
+import fastifyCookie from '@fastify/cookie'
 import fastifyCors from '@fastify/cors'
+import rateLimit from '@fastify/rate-limit'
 import Fastify from 'fastify'
 import { env } from '@/config/env'
 import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
@@ -43,8 +45,23 @@ export async function buildApp() {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 
+  // RATE LIMIT — global
+  await app.register(rateLimit, {
+    global: true,
+    max: 200,
+    timeWindow: '15 minutes',
+    errorResponseBuilder: () => ({
+      statusCode: 429,
+      error: 'Too Many Requests',
+      message: 'Rate limit exceeded. Try again later.',
+    }),
+  })
+
   // SWAGGER
   await app.register(swaggerPlugin)
+
+  // COOKIES
+  await app.register(fastifyCookie)
 
   // AUTH
   await app.register(jwtPlugin)
