@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import bcrypt from 'bcrypt'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 import { env } from '../src/config/env'
@@ -63,11 +64,14 @@ async function seed() {
   console.log('✅ Service resources linked')
 
   // Users
+  const clientHash = await bcrypt.hash('client@03', 10)
+  const adminHash = await bcrypt.hash('admin123', 10)
+
   const [client] = await db
     .insert(schema.users)
     .values([
-      { email: 'client@email.com', role: 'client' },
-      { email: 'admin@slotlock.com', role: 'admin' },
+      { email: 'client@email.com', role: 'client', passwordHash: clientHash },
+      { email: 'admin@slotlock.com', role: 'admin', passwordHash: adminHash },
     ])
     .returning()
 

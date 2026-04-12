@@ -31,8 +31,16 @@ export class DrizzleAppointmentRepository implements IAppointmentRepository {
     return result[0] ? toDomain(result[0]) : null
   }
 
-  async findAll(): Promise<Appointment[]> {
-    const result = await db.select().from(appointments)
+  async findAll(userId?: string): Promise<Appointment[]> {
+    const query = db.select().from(appointments)
+
+    if (userId) {
+      const result = await query.where(eq(appointments.userId, userId))
+      return result.map(toDomain)
+    }
+
+    // Se não tem userId (Admin), executa a query pura
+    const result = await query
     return result.map(toDomain)
   }
 

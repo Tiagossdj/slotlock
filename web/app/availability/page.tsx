@@ -1,23 +1,22 @@
 "use client";
-import { useUsers } from "@/lib/hooks/useUsers";
 import { useState } from "react";
 import { useServices } from "@/lib/hooks/useServices";
 import {
   useAvailability,
   useCreateAppointment,
 } from "@/lib/hooks/useAppointments";
-import { Search, Clock, Calendar } from "lucide-react";
+import { Search, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { getUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function AvailabilityPage() {
   const { data: services } = useServices();
-  const {data: users} = useUsers()
-  const clientUser = users?.find(u => u.role = 'client')
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [searched, setSearched] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-
+  const router = useRouter()
   const { data: slots, isLoading, refetch } = useAvailability(serviceId, date);
   const { mutate: createAppointment, isPending: isBooking } =
     useCreateAppointment();
@@ -30,11 +29,19 @@ export default function AvailabilityPage() {
     setSelectedSlot(null);
     refetch()
   }
+  
 
   const handleBook = (startTime: string) => {
+    const user = getUser()
+    if (!user) {
+      toast.error('Você precisa estar logado para agendar')
+      router.push('/login?redirect=/availability')
+      return
+    }
+  
     createAppointment(
       {
-        userId: clientUser?.id ??'', 
+        userId: user.id,
         serviceId,
         startTime,
       },
@@ -110,10 +117,7 @@ export default function AvailabilityPage() {
                 <Clock size={14} />
                 Duration: {selectedService.durationMinutes} minutes
               </span>
-              <span className="flex items-center gap-1.5">
-                <Calendar size={14} />
-                Resources needed: linked to this service
-              </span>
+
             </div>
           </div>
         )}

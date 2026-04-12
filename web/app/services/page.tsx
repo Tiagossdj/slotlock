@@ -9,6 +9,7 @@ import {
 import { Plus, Trash2, Clock } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
+import { useResources } from "@/lib/hooks/useResources";
 
 export default function ServicesPage() {
   const { data: services, isLoading } = useServices();
@@ -16,20 +17,33 @@ export default function ServicesPage() {
   const { mutate: deleteService, isPending: isDeleting } = useDeleteService();
 
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", durationMinutes: 60 });
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const { data: resources } = useResources();
+  const [form, setForm] = useState({
+    name: "",
+    durationMinutes: 60,
+    resourceIds: [] as string[],
+  });
 
+  const toggleResource = (id: string) => {
+    setForm((prev) => ({
+      ...prev,
+      resourceIds: prev.resourceIds.includes(id)
+        ? prev.resourceIds.filter((r) => r !== id)
+        : [...prev.resourceIds, id],
+    }));
+  };
   const handleSubmit = () => {
-    if (!form.name.trim()) return
+    if (!form.name.trim()) return;
     createService(form, {
       onSuccess: () => {
-        setForm({ name: '', durationMinutes: 60 })
-        setShowForm(false)
-        toast.success('Service created successfully!')
+        setForm({ name: "", durationMinutes: 60, resourceIds: [""] });
+        setShowForm(false);
+        toast.success("Service created successfully!");
       },
       onError: (err) => toast.error(err.message),
-    })
-  }
+    });
+  };
 
   const handleDelete = () => {
     if (!deleteId) return;
@@ -88,6 +102,31 @@ export default function ServicesPage() {
                 }
                 className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               />
+
+              <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                <label className="text-sm text-muted-foreground">
+                  Resources
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {resources?.map((resource) => {
+                    const selected = form.resourceIds.includes(resource.id);
+                    return (
+                      <button
+                        key={resource.id}
+                        type="button"
+                        onClick={() => toggleResource(resource.id)}
+                        className={`px-3 py-1.5 rounded-md text-sm border transition-colors ${
+                          selected
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-input text-muted-foreground border-border hover:border-ring"
+                        }`}
+                      >
+                        {resource.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex gap-3">
@@ -139,6 +178,20 @@ export default function ServicesPage() {
                 <Clock size={14} />
                 <span className="text-sm">{service.durationMinutes} min</span>
               </div>
+
+              {service.resources.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 my-2">
+                  {service.resources.map((r) => (
+                    <span
+                      key={r.id}
+                      className="text-xs px-2 py-0.5 rounded-full border border-border text-muted-foreground"
+                    >
+                      {r.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <p className="text-xs text-muted-foreground mt-3">
                 Created: {new Date(service.createdAt).toLocaleDateString()}
               </p>

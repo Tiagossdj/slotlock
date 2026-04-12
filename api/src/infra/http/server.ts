@@ -1,11 +1,15 @@
+import fastifyCookie from '@fastify/cookie'
 import fastifyCors from '@fastify/cors'
+import rateLimit from '@fastify/rate-limit'
 import Fastify from 'fastify'
 import { env } from '@/config/env'
 import { appointmentsRoutes } from '@/modules/appointments/infra/http/appointments.routes'
+import { authRoutes } from '@/modules/auth/infra/http/auth.routes'
 import { resourcesRoutes } from '@/modules/resources/infra/http/resources.routes'
 import { servicesRoutes } from '@/modules/services/infra/http/services.routes'
 import { usersRoutes } from '@/modules/users/infra/http/users.routes'
 import { errorHandler } from './error-handler'
+import jwtPlugin from './plugins/jwt'
 import { swaggerPlugin } from './plugins/swagger'
 
 const isDev = env.NODE_ENV === 'development'
@@ -41,14 +45,33 @@ export async function buildApp() {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 
+  // RATE LIMIT — global
+  await app.register(rateLimit, {
+    global: true,
+    max: 200,
+    timeWindow: '15 minutes',
+    errorResponseBuilder: () => ({
+      statusCode: 429,
+      error: 'Too Many Requests',
+      message: 'Rate limit exceeded. Try again later.',
+    }),
+  })
+
   // SWAGGER
   await app.register(swaggerPlugin)
+
+  // COOKIES
+  await app.register(fastifyCookie)
+
+  // AUTH
+  await app.register(jwtPlugin)
 
   // ROUTES
   await app.register(resourcesRoutes, { prefix: '/api' })
   await app.register(servicesRoutes, { prefix: '/api' })
   await app.register(appointmentsRoutes, { prefix: '/api' })
   await app.register(usersRoutes, { prefix: '/api' })
+  await app.register(authRoutes, { prefix: '/api' })
 
   return app
 }

@@ -2,6 +2,7 @@ import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
 import type { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
+import { env } from '@/config/env'
 
 export const swaggerPlugin = fp(async (app: FastifyInstance) => {
   await app.register(fastifySwagger, {
@@ -13,9 +14,23 @@ export const swaggerPlugin = fp(async (app: FastifyInstance) => {
       },
       servers: [
         {
-          url: process.env.RAILWAY_PUBLIC_URL ?? 'http://localhost:3000',
+          url: 'http://localhost:3000',
+          description: 'Ambiente de Desenvolvimento (Local)',
+        },
+        {
+          url: env.RAILWAY_PUBLIC_URL,
+          description: 'Servidor de Produção (Railway)',
         },
       ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
     },
   })
 

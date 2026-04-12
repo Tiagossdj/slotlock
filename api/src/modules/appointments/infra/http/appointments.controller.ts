@@ -23,8 +23,8 @@ export class AppointmentController {
     )
   }
 
-  async findAll() {
-    return await this.appointmentRepository.findAll()
+  async findAll(userId?: string) {
+    return await this.appointmentRepository.findAll(userId)
   }
 
   async findById(id: string) {

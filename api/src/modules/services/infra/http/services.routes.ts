@@ -20,6 +20,17 @@ const serviceResponseSchema = {
     durationMinutes: { type: 'number' },
     createdAt: { type: 'string' },
     updatedAt: { type: 'string' },
+    resources: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          type: { type: 'string' },
+        },
+      },
+    },
   },
 }
 
@@ -64,9 +75,11 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Create a service',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         body: createServiceBodySchema,
         response: { 201: serviceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       const service = await controller.create(req.body)
@@ -80,10 +93,12 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Update a service',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         body: updateServiceBodySchema,
         response: { 200: serviceResponseSchema },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       const service = await controller.update(req.params.id, req.body)
@@ -97,9 +112,11 @@ export async function servicesRoutes(app: AppInstance) {
       schema: {
         summary: 'Delete a service',
         tags: ['Services'],
+        security: [{ bearerAuth: [] }],
         params: paramsSchema,
         response: { 204: { type: 'null' } },
       },
+      onRequest: [async (req, reply) => await app.requireAdmin(req, reply)],
     },
     async (req, reply) => {
       await controller.delete(req.params.id)

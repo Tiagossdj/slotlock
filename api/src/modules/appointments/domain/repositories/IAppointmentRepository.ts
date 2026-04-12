@@ -6,7 +6,7 @@ import type {
 
 export interface IAppointmentRepository {
   findById(id: string): Promise<Appointment | null>
-  findAll(): Promise<Appointment[]>
+  findAll(userId?: string): Promise<Appointment[]>
   create(data: CreateAppointmentData): Promise<Appointment>
   update(id: string, data: Partial<UpdateAppointmentData>): Promise<Appointment>
   delete(id: string): Promise<void>
