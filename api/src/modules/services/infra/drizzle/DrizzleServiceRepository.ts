@@ -99,21 +99,24 @@ export class DrizzleServiceRepository implements IServiceRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db
-      .transaction(async (tx) => {
+    try {
+      await db.transaction(async (tx) => {
         await tx
           .delete(serviceResources)
           .where(eq(serviceResources.serviceId, id))
         await tx.delete(services).where(eq(services.id, id))
       })
-      .catch((err) => {
-        if (err.message?.includes('appointments_service_id_services_id_fk')) {
-          throw new ConflictError(
-            'Service has appointments and cannot be deleted',
-          )
-        }
-        throw err
-      })
+    } catch (err: unknown) {
+      if (
+        err instanceof Error &&
+        err.message?.includes('appointments_service_id_services_id_fk')
+      ) {
+        throw new ConflictError(
+          'Service has appointments and cannot be deleted',
+        )
+      }
+      throw err
+    }
   }
 
   async findResourcesByServiceId(
