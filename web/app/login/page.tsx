@@ -19,8 +19,10 @@ export function LoginForm() {
     e.preventDefault()
     login.mutate({ email, password }, {
       onSuccess: ({ user }) => {
-        router.push(redirect ?? (user.role === 'admin' ? '/' : '/availability'))
-        router.refresh()
+        const destination = redirect ?? (user.role === 'admin' ? '/' : '/availability')
+        setTimeout(() => {
+          window.location.href = destination
+        }, 200)
       }
     })
   }
