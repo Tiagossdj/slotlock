@@ -16,11 +16,11 @@ import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useLogout } from "@/lib/hooks/useAuth";
-import { getUser } from "@/lib/auth";
+import { useLogout, useMe } from "@/lib/hooks/useAuth";
 
 const adminNavItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -38,7 +38,10 @@ const clientNavItems = [
 function NavContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const logout = useLogout();
-  const user = getUser();
+  const {data: user, isLoading} = useMe()
+
+  if (isLoading) return null 
+
   const navItems = user?.role === "admin" ? adminNavItems : clientNavItems;
 
   return (
@@ -122,6 +125,7 @@ export function Sidebar() {
 
           <SheetContent side="left" className="w-64 p-0 bg-card border-border">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">Main navigation sidebar</SheetDescription>
             <NavContent onClose={() => setOpen(false)} />
           </SheetContent>
         </Sheet>

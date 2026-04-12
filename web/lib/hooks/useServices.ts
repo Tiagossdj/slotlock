@@ -20,7 +20,7 @@ export function useService(id: string) {
 export function useCreateService() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { name: string; durationMinutes: number }) =>
+    mutationFn: (data: { name: string; durationMinutes: number; resourceIds: string[] }) =>
       apiFetch<Service>('/api/services', {
         method: 'POST',
         body: JSON.stringify(data),
