@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useLogin } from '@/lib/hooks/useAuth'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -12,12 +13,13 @@ export function LoginForm() {
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect')
   const login = useLogin()
+  const router = useRouter()
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     login.mutate({ email, password }, {
       onSuccess: ({ user }) => {
-        window.location.href = redirect ?? (user.role === 'admin' ? '/' : '/availability')
+        router.push(redirect ?? (user.role === 'admin' ? '/' : '/availability'))
       }
     })
   }
