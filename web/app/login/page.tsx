@@ -17,6 +17,7 @@ export function LoginForm() {
     e.preventDefault()
     login.mutate({ email, password }, {
       onSuccess: ({ user }) => {
+        document.cookie = `slotlock_session=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
         const destination = redirect ?? (user.role === 'admin' ? '/' : '/availability')
         window.location.href = destination
       }

@@ -41,11 +41,13 @@ export function useRegister() {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    onSuccess: ({ user, token }) => {
-      localStorage.setItem('slotlock_token', token)
-      setAuth(user)
-      queryClient.setQueryData(['me'], user)
-    },
+      onSuccess: ({ user, token }) => {
+        localStorage.setItem('slotlock_token', token)
+        document.cookie = `slotlock_session=1; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+        setAuth(user)
+        queryClient.setQueryData(['me'], user)
+        window.location.href = '/availability'
+      },
   })
 }
 
@@ -54,7 +56,8 @@ export function useLogout() {
 
   return async function logout() {
     await apiFetch('/api/auth/logout', { method: 'POST', body: JSON.stringify({}) }).catch(() => {})
-    localStorage.removeItem('slotlock_token') // ← limpa o localStorage
+    localStorage.removeItem('slotlock_token')
+    document.cookie = 'slotlock_session=; path=/; max-age=0' //  limpa o cookie
     clearAuth()
     queryClient.clear()
     window.location.href = '/login'
