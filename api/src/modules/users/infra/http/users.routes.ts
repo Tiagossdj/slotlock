@@ -12,7 +12,14 @@ export async function usersRoutes(app: AppInstance) {
       },
     },
     async (req, reply) => {
-      const result = await db.select().from(users)
+      const result = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          role: users.role,
+          createdAt: users.createdAt,
+        })
+        .from(users)
       return reply.status(200).send(result)
     },
   )
