@@ -9,7 +9,7 @@ export function proxy(request: NextRequest) {
 
   if (pathname.startsWith('/api')) return NextResponse.next()
 
-  const token = request.cookies.get('slotlock_token')?.value
+  const token = request.cookies.get('slotlock_auth')?.value
 
   if (AUTH_ROUTES.includes(pathname) && token) {
     return NextResponse.redirect(new URL('/', request.url))

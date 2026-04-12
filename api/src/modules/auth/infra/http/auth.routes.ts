@@ -71,6 +71,13 @@ export async function authRoutes(app: AppInstance) {
         path: '/',
       })
 
+      reply.setCookie('slotlock_auth', '1', {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      })
+
       return reply.send({ user, token })
     },
   )
@@ -101,6 +108,13 @@ export async function authRoutes(app: AppInstance) {
         path: '/',
       })
 
+      reply.setCookie('slotlock_auth', '1', {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      })
+
       return reply.send({ user, token })
     },
   )
@@ -115,6 +129,13 @@ export async function authRoutes(app: AppInstance) {
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       })
+
+      reply.clearCookie('slotlock_auth', {
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+      })
+
       return reply.send({ ok: true })
     },
   )
