@@ -92,7 +92,7 @@ SlotLock follows **Clean Architecture** principles — domain logic has zero fra
 - **Controllers receive plain data** — not `FastifyRequest`. Routes extract params/body and pass them to controllers. This decouples business logic from the HTTP framework entirely.
 - **Domain entities are pure TypeScript** — no Drizzle types leak into the domain. Each repository has a `toDomain()` function that maps raw DB rows to domain entities.
 - **Repository interfaces** define contracts — swapping Drizzle for Prisma or MongoDB only requires a new implementation, not changes to business logic.
-- **httpOnly cookies** — JWT tokens are never exposed to JavaScript. The token lives exclusively in a `httpOnly` cookie, mitigating XSS attacks entirely.
+- **httpOnly cookies** JWT tokens are never exposed to JavaScript, mitigating XSS attack risks.
 
 ```mermaid
 ---
