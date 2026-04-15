@@ -74,17 +74,33 @@ The name references the core technical mechanism: **pessimistic locking** via `S
 
 SlotLock follows **Clean Architecture** principles — domain logic has zero framework dependencies.
 
-```
-                              ┌─────────────────────────────────────────────────────────┐
-                              │                      HTTP Layer                         │
-                              │          Routes → Controllers → DTOs                    │
-                              ├─────────────────────────────────────────────────────────┤
-                              │                     Domain Layer                        │
-                              │       Entities → Repository Interfaces → Services       │
-                              ├─────────────────────────────────────────────────────────┤
-                              │               Infrastructure Layer                      │
-                              │          Drizzle Repositories → PostgreSQL              │
-                              └─────────────────────────────────────────────────────────┘
+```mermaid
+---
+config:
+  layout: dagre
+  theme: neo
+  look: neo
+---
+flowchart TB
+    subgraph HTTP["HTTP Layer"]
+        Routes["Routes"] --> Controllers["Controllers"] --> DTOs["DTOs"]
+    end
+    subgraph Domain["Domain Layer"]
+        Entities["Entities"] --> Interfaces["Repository Interfaces"] --> Services["Services"]
+    end
+    subgraph Infra["Infrastructure Layer"]
+        Drizzle["Drizzle ORM"] --> PostgreSQL[("PostgreSQL")]
+    end
+    HTTP --> Domain --> Infra
+
+    style Routes fill:#fffcde,stroke:#FFF9C4
+    style Controllers fill:#fffcde,stroke:#FFF9C4
+    style DTOs fill:#fffcde,stroke:#FFF9C4
+    style Entities fill:#fffcde,stroke:#FFF9C4
+    style Interfaces fill:#fffcde,stroke:#FFF9C4
+    style Services fill:#fffcde,stroke:#FFF9C4
+    style Drizzle fill:#fffcde,stroke:#FFF9C4
+    style PostgreSQL fill:#316192,color:#fff,stroke:#BBDEFB
 ```
 
 **Key decisions:**
