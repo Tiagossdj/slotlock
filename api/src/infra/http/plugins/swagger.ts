@@ -14,6 +14,11 @@ export const swaggerPlugin = fp(async (app: FastifyInstance) => {
       },
       servers: [
         {
+          url: env.API_URL,
+          description: 'Servidor de Produção (Render)',
+        },
+
+        {
           url: 'http://localhost:3000',
           description: 'Ambiente de Desenvolvimento (Local)',
         },

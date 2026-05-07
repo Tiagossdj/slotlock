@@ -4,7 +4,7 @@ config({
   path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
 })
 
-const required = ['DATABASE_URL', 'PORT', 'JWT_SECRET'] as const
+const required = ['DATABASE_URL', 'PORT', 'JWT_SECRET', 'API_URL'] as const
 
 for (const key of required) {
   if (!process.env[key]) {
@@ -18,4 +18,5 @@ export const env = {
   HOST: process.env.HOST ?? '0.0.0.0',
   NODE_ENV: process.env.NODE_ENV ?? 'development',
   JWT_SECRET: process.env.JWT_SECRET as string,
+  API_URL: process.env.API_URL as string,
 }

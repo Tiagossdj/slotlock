@@ -40,6 +40,7 @@ export async function buildApp() {
       'http://127.0.0.1:3000',
       'http://localhost:3000',
       'https://slotlock-web.vercel.app',
+      'https://slotlock.onrender.com',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
