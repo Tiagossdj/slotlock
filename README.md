@@ -11,7 +11,7 @@
 ---
 ## 🔗 Live Demo
 - **Frontend:** https://slotlock-web.vercel.app
-- **API Docs:** https://slotlock.up.railway.app/docs
+- **API Docs:** https://slotlock.onrender.com/docs
 
 ---
 
@@ -308,7 +308,7 @@ SlotLock uses **JWT with httpOnly cookies** — the token is never accessible to
 3. `GET /api/auth/me` — reads the cookie server-side, returns the authenticated user
 4. `POST /api/auth/logout` — clears the cookie on the server
 
-> **Note:** In the deployed version (Vercel + Railway), the JWT token is stored in `localStorage` due to cross-origin cookie restrictions. See [Known Limitations](#known-limitations).
+> **Note:** In the deployed version (Vercel + Render), the JWT token is stored in `localStorage` due to cross-origin cookie restrictions. See [Known Limitations](#known-limitations).
 
 ### Rate Limiting
 
@@ -446,7 +446,7 @@ The seed creates a realistic salon scenario:
 |------|------|
 | Resources | Ana Paula (professional), Sala 1 (room), Kit Lash (equipment), Carla (professional), Sala 2 (room), Kit Manicure (equipment) |
 | Services | Lash Designer (120 min) → Ana Paula + Sala 1 + Kit Lash, Manicure (60 min) → Carla + Sala 2 + Kit Manicure |
-| Users | `client@email.com` / `client123`, `admin@slotlock.com` / `admin123` |
+| Users | `client@email.com` / `client@03`, `admin@slotlock.com` / `admin123` |
 | Appointments | Sample confirmed appointments on 2026-06-01 |
 
 ---
@@ -472,7 +472,7 @@ Technical decisions, architecture details and known trade-offs are documented in
 
 ### Authentication Storage
 JWT tokens are stored in `localStorage` due to cross-origin restrictions between 
-the deployment platforms (Vercel/Railway). In a production environment with a 
+the deployment platforms (Vercel/Render). In a production environment with a 
 custom domain, the recommendation would be to use `httpOnly` cookies with 
 `SameSite: Strict` for better security against XSS attacks.
 
